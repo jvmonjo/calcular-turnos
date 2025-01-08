@@ -49,14 +49,14 @@
      * @returns {string} - Turno correspondiente ('A', 'L' o 'V')
      */
     function calcularTurno(fechaInicio, turnoInicio, fechaObjetivo) {
-      // Calcular la cantidad de días transcurridos desde la fecha de inicio
+      // Calcular la cantidad de días transcurridos (puede ser negativo para fechas pasadas)
       const diferenciaDias = Math.floor((fechaObjetivo - fechaInicio) / (1000 * 60 * 60 * 24));
 
       // Determinar el índice inicial en la secuencia basado en el turno inicial
       const indiceInicio = secuenciaTurnos.indexOf(turnoInicio);
 
-      // Calcular el índice en la secuencia
-      const indiceTurno = (indiceInicio + diferenciaDias) % secuenciaTurnos.length;
+      // Calcular el índice en la secuencia considerando días negativos
+      const indiceTurno = (indiceInicio + (diferenciaDias % secuenciaTurnos.length) + secuenciaTurnos.length) % secuenciaTurnos.length;
 
       // Devolver el turno correspondiente
       return secuenciaTurnos[indiceTurno];
