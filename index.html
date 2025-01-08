@@ -65,6 +65,18 @@
       return secuenciaTurnos[indiceTurno];
     }
 
+    /**
+     * Función para calcular el turno inicial del 1 de enero del año objetivo
+     * @param {Date} fechaInicio - Fecha de inicio
+     * @param {string} turnoInicio - Turno correspondiente a la fecha de inicio
+     * @param {number} yearObjetivo - Año objetivo
+     * @returns {string} - Turno correspondiente al 1 de enero del año objetivo
+     */
+    function calcularTurnoInicialAnio(fechaInicio, turnoInicio, yearObjetivo) {
+      const fechaObjetivo = new Date(`${yearObjetivo}-01-01T00:00:00`);
+      return calcularTurno(fechaInicio, turnoInicio, fechaObjetivo);
+    }
+
     // Manejar el envío del formulario
     document.getElementById('turnoForm').addEventListener('submit', function(event) {
       event.preventDefault();
@@ -95,22 +107,18 @@
       // Obtener el año de la fecha de inicio
       const year = fechaInicio.getFullYear();
 
+      // Calcular el turno inicial del 1 de enero del año objetivo
+      const turnoInicial = calcularTurnoInicialAnio(fechaInicio, turnoInicio, year);
+
       // Crear los datos para el año
       const turnos = [];
       const fechaActual = new Date(`${year}-01-01T00:00:00`);
       const finAnio = new Date(`${year}-12-31T23:59:59`);
 
-      // Calcular el turno inicial para el 1 de enero del año
-      const turnoInicial = calcularTurno(fechaInicio, turnoInicio, fechaActual);
-
-      // Ajustar la fecha actual al turno inicial
-      let indiceInicial = secuenciaTurnos.indexOf(turnoInicial);
-
       while (fechaActual <= finAnio) {
-        const turno = secuenciaTurnos[indiceInicial % secuenciaTurnos.length];
+        const turno = calcularTurno(fechaInicio, turnoInicio, new Date(fechaActual));
         turnos.push({ Fecha: fechaActual.toLocaleDateString('es-ES'), Turno: turno });
         fechaActual.setDate(fechaActual.getDate() + 1);
-        indiceInicial++;
       }
 
       // Convertir datos a Excel
