@@ -9,7 +9,7 @@
       font-family: Arial, sans-serif;
       margin: 20px;
     }
-    label, input, button {
+    label, input, select, button {
       margin: 10px 0;
       display: block;
     }
@@ -18,8 +18,15 @@
 <body>
   <h1>Calculadora de Turnos</h1>
   <form id="turnoForm">
-    <label for="inicio">Fecha de inicio del turno (semana larga de avanzada):</label>
+    <label for="inicio">Fecha de inicio:</label>
     <input type="date" id="inicio" required>
+
+    <label for="turnoInicio">Turno correspondiente a la fecha de inicio:</label>
+    <select id="turnoInicio" required>
+      <option value="A">A</option>
+      <option value="L">L</option>
+      <option value="V">V</option>
+    </select>
 
     <label for="fecha">Fecha para calcular:</label>
     <input type="date" id="fecha" required>
@@ -36,16 +43,20 @@
 
     /**
      * Función para calcular el turno que corresponde a una fecha específica
-     * @param {Date} fechaInicio - Fecha de inicio del turno
+     * @param {Date} fechaInicio - Fecha de inicio
+     * @param {string} turnoInicio - Turno correspondiente a la fecha de inicio
      * @param {Date} fechaObjetivo - Fecha para calcular el turno
      * @returns {string} - Turno correspondiente ('A', 'L' o 'V')
      */
-    function calcularTurno(fechaInicio, fechaObjetivo) {
+    function calcularTurno(fechaInicio, turnoInicio, fechaObjetivo) {
       // Calcular la cantidad de días transcurridos desde la fecha de inicio
       const diferenciaDias = Math.floor((fechaObjetivo - fechaInicio) / (1000 * 60 * 60 * 24));
 
+      // Determinar el índice inicial en la secuencia basado en el turno inicial
+      const indiceInicio = secuenciaTurnos.indexOf(turnoInicio);
+
       // Calcular el índice en la secuencia
-      const indiceTurno = diferenciaDias % secuenciaTurnos.length;
+      const indiceTurno = (indiceInicio + diferenciaDias) % secuenciaTurnos.length;
 
       // Devolver el turno correspondiente
       return secuenciaTurnos[indiceTurno];
@@ -56,6 +67,7 @@
       event.preventDefault();
 
       const fechaInicio = new Date(document.getElementById('inicio').value);
+      const turnoInicio = document.getElementById('turnoInicio').value;
       const fechaObjetivo = new Date(document.getElementById('fecha').value);
 
       if (isNaN(fechaInicio) || isNaN(fechaObjetivo)) {
@@ -63,7 +75,7 @@
         return;
       }
 
-      const turno = calcularTurno(fechaInicio, fechaObjetivo);
+      const turno = calcularTurno(fechaInicio, turnoInicio, fechaObjetivo);
       document.getElementById('resultado').textContent = `El turno para el día ${fechaObjetivo.toLocaleDateString()} es: ${turno}`;
     });
   </script>
