@@ -92,8 +92,10 @@
         return;
       }
 
+      // Obtener el año de la fecha de inicio
+      const year = fechaInicio.getFullYear();
+
       // Crear los datos para el año
-      const year = new Date().getFullYear();
       const turnos = [];
       const fechaActual = new Date(`${year}-01-01`);
       const finAnio = new Date(`${year}-12-31`);
