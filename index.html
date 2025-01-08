@@ -24,7 +24,6 @@
     <label for="turnoInicio">Turno correspondiente a la fecha de inicio:</label>
     <select id="turnoInicio" required>
       <option value="A">A</option>
-      <option value="L">L</option>
       <option value="V">V</option>
     </select>
 
@@ -40,9 +39,54 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script>
-    // Secuencia de turnos
-    const secuenciaTurnos = ['A', 'L', 'V', 'L', 'A', 'A', 'A', 'L', 'V', 'L', 'A', 'L', 'L', 'L',
-                            'V', 'L', 'A', 'L', 'V', 'V', 'V', 'L', 'A', 'L', 'V', 'L', 'L', 'L'];
+    // Secuencia de turnos definida como un array de objetos asociado a días de la semana
+    const secuenciaTurnos = [
+      { A: "Lunes" },
+      { L: "Martes" },
+      { V: "Miércoles" },
+      { L: "Jueves" },
+      { A: "Viernes" },
+      { A: "Sábado" },
+      { A: "Domingo" },
+      { L: "Lunes" },
+      { V: "Martes" },
+      { L: "Miércoles" },
+      { A: "Jueves" },
+      { L: "Viernes" },
+      { L: "Sábado" },
+      { L: "Domingo" },
+      { V: "Lunes" },
+      { L: "Martes" },
+      { A: "Miércoles" },
+      { L: "Jueves" },
+      { V: "Viernes" },
+      { V: "Sábado" },
+      { V: "Domingo" },
+      { L: "Lunes" },
+      { A: "Martes" },
+      { L: "Miércoles" },
+      { V: "Jueves" },
+      { L: "Viernes" },
+      { L: "Sábado" },
+      { L: "Domingo" }
+    ];
+
+    /**
+     * Función para calcular el índice inicial basándose en la fecha de inicio y el turno
+     * @param {Date} fechaInicio - Fecha de inicio
+     * @param {string} turnoInicio - Turno correspondiente a la fecha de inicio
+     * @returns {number} - Índice del turno inicial
+     */
+    function calcularIndiceInicio(fechaInicio, turnoInicio) {
+      const diasSemana = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+      const diaSemanaInicio = diasSemana[fechaInicio.getDay()];
+
+      return secuenciaTurnos.findIndex(turno => {
+        const letraTurno = Object.keys(turno)[0];
+        const diaTurno = Object.values(turno)[0];
+        return letraTurno === turnoInicio && diaTurno === diaSemanaInicio;
+      });
+    }
 
     /**
      * Función para calcular el turno que corresponde a una fecha específica
@@ -52,17 +96,21 @@
      * @returns {string} - Turno correspondiente ('A', 'L' o 'V')
      */
     function calcularTurno(fechaInicio, turnoInicio, fechaObjetivo) {
-      // Calcular la cantidad de días transcurridos (puede ser negativo para fechas pasadas)
+      // Calcular días transcurridos (positivo o negativo)
       const diferenciaDias = Math.floor((fechaObjetivo - fechaInicio) / (1000 * 60 * 60 * 24));
 
-      // Determinar el índice inicial en la secuencia basado en el turno inicial
-      const indiceInicio = secuenciaTurnos.indexOf(turnoInicio);
+      // Calcular índice del turno inicial
+      const indiceInicio = calcularIndiceInicio(fechaInicio, turnoInicio);
+      if (indiceInicio === -1) {
+        throw new Error("No se pudo determinar el índice inicial. Verifica la fecha y el turno de inicio.");
+      }
 
-      // Calcular el índice en la secuencia considerando días negativos
-      const indiceTurno = (indiceInicio + (diferenciaDias % secuenciaTurnos.length) + secuenciaTurnos.length) % secuenciaTurnos.length;
+      // Calcular índice del turno objetivo
+      const totalTurnos = secuenciaTurnos.length;
+      const indiceObjetivo = (indiceInicio + diferenciaDias + totalTurnos) % totalTurnos;
 
-      // Devolver el turno correspondiente
-      return secuenciaTurnos[indiceTurno];
+      // Obtener el turno correspondiente
+      return Object.keys(secuenciaTurnos[indiceObjetivo])[0];
     }
 
     // Manejar el envío del formulario
@@ -78,8 +126,12 @@
         return;
       }
 
-      const turno = calcularTurno(fechaInicio, turnoInicio, fechaObjetivo);
-      document.getElementById('resultado').textContent = `El turno para el día ${fechaObjetivo.toLocaleDateString()} es: ${turno}`;
+      try {
+        const turno = calcularTurno(fechaInicio, turnoInicio, fechaObjetivo);
+        document.getElementById('resultado').textContent = `El turno para el día ${fechaObjetivo.toLocaleDateString()} es: ${turno}`;
+      } catch (error) {
+        document.getElementById('resultado').textContent = error.message;
+      }
     });
 
     // Exportar turnos a Excel
@@ -92,17 +144,22 @@
         return;
       }
 
-      // Obtener el año de la fecha de inicio
       const year = fechaInicio.getFullYear();
 
       // Crear los datos para el año
       const turnos = [];
-      const fechaActual = new Date(`${year}-01-01`);
-      const finAnio = new Date(`${year}-12-31`);
+      let fechaActual = new Date(`${year}-01-01T00:00:00`);
+      const finAnio = new Date(`${year}-12-31T23:59:59`);
 
       while (fechaActual <= finAnio) {
-        const turno = calcularTurno(fechaInicio, turnoInicio, new Date(fechaActual));
-        turnos.push({ Fecha: fechaActual.toLocaleDateString(), Turno: turno });
+        try {
+          const turno = calcularTurno(fechaInicio, turnoInicio, fechaActual);
+          turnos.push({ Fecha: fechaActual.toLocaleDateString('es-ES'), Turno: turno });
+        } catch (error) {
+          turnos.push({ Fecha: fechaActual.toLocaleDateString('es-ES'), Turno: "Error" });
+        }
+
+        // Avanzar al siguiente día
         fechaActual.setDate(fechaActual.getDate() + 1);
       }
 
