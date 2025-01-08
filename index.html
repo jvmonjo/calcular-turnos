@@ -97,12 +97,12 @@
 
       // Crear los datos para el año
       const turnos = [];
-      const fechaActual = new Date(`${year}-01-01`);
-      const finAnio = new Date(`${year}-12-31`);
+      const fechaActual = new Date(`${year}-01-01T00:00:00`);
+      const finAnio = new Date(`${year}-12-31T23:59:59`);
 
       while (fechaActual <= finAnio) {
         const turno = calcularTurno(fechaInicio, turnoInicio, new Date(fechaActual));
-        turnos.push({ Fecha: fechaActual.toLocaleDateString(), Turno: turno });
+        turnos.push({ Fecha: fechaActual.toLocaleDateString('es-ES'), Turno: turno });
         fechaActual.setDate(fechaActual.getDate() + 1);
       }
 
