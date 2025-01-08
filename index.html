@@ -65,39 +65,6 @@
       return secuenciaTurnos[indiceTurno];
     }
 
-    /**
-     * Función para calcular el turno inicial del 1 de enero del año objetivo
-     * @param {Date} fechaInicio - Fecha de inicio
-     * @param {string} turnoInicio - Turno correspondiente a la fecha de inicio
-     * @param {number} yearObjetivo - Año objetivo
-     * @returns {string} - Turno correspondiente al 1 de enero del año objetivo
-     */
-    function calcularTurnoInicialAnio(fechaInicio, turnoInicio, yearObjetivo) {
-      const fechaObjetivo = new Date(`${yearObjetivo}-01-01T00:00:00`);
-      return calcularTurno(fechaInicio, turnoInicio, fechaObjetivo);
-    }
-
-    /**
-     * Función para ajustar el turno inicial teniendo en cuenta cambios de año y día de la semana
-     * @param {Date} fechaInicio - Fecha de inicio
-     * @param {string} turnoInicio - Turno correspondiente a la fecha de inicio
-     * @param {number} yearObjetivo - Año objetivo
-     * @returns {number} - Índice ajustado para el turno del 1 de enero del año objetivo
-     */
-    function calcularIndiceTurnoInicio(fechaInicio, turnoInicio, yearObjetivo) {
-      const fechaObjetivo = new Date(`${yearObjetivo}-01-01T00:00:00`);
-
-      // Calcular días transcurridos desde la fecha de inicio al 1 de enero del año objetivo
-      const diferenciaDias = Math.floor((fechaObjetivo - fechaInicio) / (1000 * 60 * 60 * 24));
-
-      // Determinar el índice inicial en la secuencia basado en el turno inicial
-      const indiceInicio = secuenciaTurnos.indexOf(turnoInicio);
-
-      // Calcular el índice ajustado
-      const indiceTurno = (indiceInicio + (diferenciaDias % secuenciaTurnos.length) + secuenciaTurnos.length) % secuenciaTurnos.length;
-      return indiceTurno;
-    }
-
     // Manejar el envío del formulario
     document.getElementById('turnoForm').addEventListener('submit', function(event) {
       event.preventDefault();
@@ -125,21 +92,15 @@
         return;
       }
 
-      // Obtener el año de la fecha de inicio
-      const year = fechaInicio.getFullYear();
-
-      // Calcular el índice inicial para el turno del 1 de enero del año objetivo
-      const indiceTurnoInicio = calcularIndiceTurnoInicio(fechaInicio, turnoInicio, year);
-
       // Crear los datos para el año
+      const year = new Date().getFullYear();
       const turnos = [];
-      const fechaActual = new Date(`${year}-01-01T00:00:00`);
-      const finAnio = new Date(`${year}-12-31T23:59:59`);
+      const fechaActual = new Date(`${year}-01-01`);
+      const finAnio = new Date(`${year}-12-31`);
 
       while (fechaActual <= finAnio) {
-        const indiceTurno = (indiceTurnoInicio + (fechaActual.getDate() - 1) % secuenciaTurnos.length) % secuenciaTurnos.length;
-        const turno = secuenciaTurnos[indiceTurno];
-        turnos.push({ Fecha: fechaActual.toLocaleDateString('es-ES'), Turno: turno });
+        const turno = calcularTurno(fechaInicio, turnoInicio, new Date(fechaActual));
+        turnos.push({ Fecha: fechaActual.toLocaleDateString(), Turno: turno });
         fechaActual.setDate(fechaActual.getDate() + 1);
       }
 
