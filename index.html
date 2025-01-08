@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cálculo de Turnos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    label, input, button {
+      margin: 10px 0;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h1>Calculadora de Turnos</h1>
+  <form id="turnoForm">
+    <label for="inicio">Fecha de inicio del turno (semana larga de avanzada):</label>
+    <input type="date" id="inicio" required>
+
+    <label for="fecha">Fecha para calcular:</label>
+    <input type="date" id="fecha" required>
+
+    <button type="submit">Calcular Turno</button>
+  </form>
+
+  <h2 id="resultado"></h2>
+
+  <script>
+    // Secuencia de turnos
+    const secuenciaTurnos = ['A', 'L', 'V', 'L', 'A', 'A', 'A', 'L', 'V', 'L', 'A', 'L', 'L', 'L',
+                            'V', 'L', 'A', 'L', 'V', 'V', 'V', 'L', 'A', 'L', 'V', 'L', 'L', 'L'];
+
+    /**
+     * Función para calcular el turno que corresponde a una fecha específica
+     * @param {Date} fechaInicio - Fecha de inicio del turno
+     * @param {Date} fechaObjetivo - Fecha para calcular el turno
+     * @returns {string} - Turno correspondiente ('A', 'L' o 'V')
+     */
+    function calcularTurno(fechaInicio, fechaObjetivo) {
+      // Calcular la cantidad de días transcurridos desde la fecha de inicio
+      const diferenciaDias = Math.floor((fechaObjetivo - fechaInicio) / (1000 * 60 * 60 * 24));
+
+      // Calcular el índice en la secuencia
+      const indiceTurno = diferenciaDias % secuenciaTurnos.length;
+
+      // Devolver el turno correspondiente
+      return secuenciaTurnos[indiceTurno];
+    }
+
+    // Manejar el envío del formulario
+    document.getElementById('turnoForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const fechaInicio = new Date(document.getElementById('inicio').value);
+      const fechaObjetivo = new Date(document.getElementById('fecha').value);
+
+      if (isNaN(fechaInicio) || isNaN(fechaObjetivo)) {
+        document.getElementById('resultado').textContent = 'Por favor, introduce fechas válidas.';
+        return;
+      }
+
+      const turno = calcularTurno(fechaInicio, fechaObjetivo);
+      document.getElementById('resultado').textContent = `El turno para el día ${fechaObjetivo.toLocaleDateString()} es: ${turno}`;
+    });
+  </script>
+</body>
+</html>
