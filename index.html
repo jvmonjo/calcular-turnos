@@ -33,8 +33,7 @@
     <button type="submit">Calcular Turno</button>
   </form>
 
-<!--   <button id="exportarExcel">Exportar Turnos del Año</button> -->
-
+  <button id="exportarExcel">Exportar Turnos del Año</button>
 
   <h2 id="resultado"></h2>
 
@@ -152,16 +151,23 @@
       let fechaActual = new Date(`${year}-01-01T00:00:00`);
       const finAnio = new Date(`${year}-12-31T23:59:59`);
 
-      while (fechaActual <= finAnio) {
-        try {
-          const turno = calcularTurno(fechaInicio, turnoInicio, fechaActual);
-          turnos.push({ Fecha: fechaActual.toLocaleDateString('es-ES'), Turno: turno });
-        } catch (error) {
-          turnos.push({ Fecha: fechaActual.toLocaleDateString('es-ES'), Turno: "Error" });
-        }
+      // Calcular el índice inicial para el 1 de enero
+      const indiceInicioAnio = calcularIndiceInicio(fechaInicio, turnoInicio);
 
-        // Avanzar al siguiente día
+      if (indiceInicioAnio === -1) {
+        alert("No se pudo calcular el índice inicial para el año seleccionado.");
+        return;
+      }
+
+      let indiceActual = indiceInicioAnio;
+
+      while (fechaActual <= finAnio) {
+        const turno = Object.keys(secuenciaTurnos[indiceActual])[0];
+        turnos.push({ Fecha: fechaActual.toLocaleDateString('es-ES'), Turno: turno });
+
+        // Avanzar al siguiente día y al siguiente índice
         fechaActual.setDate(fechaActual.getDate() + 1);
+        indiceActual = (indiceActual + 1) % secuenciaTurnos.length;
       }
 
       // Convertir datos a Excel
