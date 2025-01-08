@@ -100,10 +100,17 @@
       const fechaActual = new Date(`${year}-01-01T00:00:00`);
       const finAnio = new Date(`${year}-12-31T23:59:59`);
 
+      // Calcular el turno inicial para el 1 de enero del año
+      const turnoInicial = calcularTurno(fechaInicio, turnoInicio, fechaActual);
+
+      // Ajustar la fecha actual al turno inicial
+      let indiceInicial = secuenciaTurnos.indexOf(turnoInicial);
+
       while (fechaActual <= finAnio) {
-        const turno = calcularTurno(fechaInicio, turnoInicio, new Date(fechaActual));
+        const turno = secuenciaTurnos[indiceInicial % secuenciaTurnos.length];
         turnos.push({ Fecha: fechaActual.toLocaleDateString('es-ES'), Turno: turno });
         fechaActual.setDate(fechaActual.getDate() + 1);
+        indiceInicial++;
       }
 
       // Convertir datos a Excel
