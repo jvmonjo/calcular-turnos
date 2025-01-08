@@ -34,8 +34,11 @@
     <button type="submit">Calcular Turno</button>
   </form>
 
+  <button id="exportarExcel">Exportar Turnos del Año</button>
+
   <h2 id="resultado"></h2>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script>
     // Secuencia de turnos
     const secuenciaTurnos = ['A', 'L', 'V', 'L', 'A', 'A', 'A', 'L', 'V', 'L', 'A', 'L', 'L', 'L',
@@ -77,6 +80,37 @@
 
       const turno = calcularTurno(fechaInicio, turnoInicio, fechaObjetivo);
       document.getElementById('resultado').textContent = `El turno para el día ${fechaObjetivo.toLocaleDateString()} es: ${turno}`;
+    });
+
+    // Exportar turnos a Excel
+    document.getElementById('exportarExcel').addEventListener('click', function() {
+      const fechaInicio = new Date(document.getElementById('inicio').value);
+      const turnoInicio = document.getElementById('turnoInicio').value;
+
+      if (isNaN(fechaInicio)) {
+        alert('Por favor, introduce una fecha de inicio válida.');
+        return;
+      }
+
+      // Crear los datos para el año
+      const year = new Date().getFullYear();
+      const turnos = [];
+      const fechaActual = new Date(`${year}-01-01`);
+      const finAnio = new Date(`${year}-12-31`);
+
+      while (fechaActual <= finAnio) {
+        const turno = calcularTurno(fechaInicio, turnoInicio, new Date(fechaActual));
+        turnos.push({ Fecha: fechaActual.toLocaleDateString(), Turno: turno });
+        fechaActual.setDate(fechaActual.getDate() + 1);
+      }
+
+      // Convertir datos a Excel
+      const worksheet = XLSX.utils.json_to_sheet(turnos);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Turnos');
+
+      // Descargar el archivo Excel
+      XLSX.writeFile(workbook, `Turnos_${year}.xlsx`);
     });
   </script>
 </body>
