@@ -3,7 +3,12 @@
   "version": "1.0.0",
   "description": "Aplicació PWA per calcular turnos",
   "scripts": {
-    "generate-icons": "node icons/generate-icons.js"
+    "generate-icons": "node icons/generate-icons.js",
+    "version:patch": "node scripts/bump-version.js patch",
+    "version:minor": "node scripts/bump-version.js minor",
+    "version:major": "node scripts/bump-version.js major",
+    "setup-hooks": "node scripts/setup-hooks.js",
+    "postinstall": "npm run setup-hooks"
   },
   "devDependencies": {
     "sharp": "^0.33.0"

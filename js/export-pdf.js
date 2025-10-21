@@ -157,14 +157,13 @@ function exportarPDF(fechaInicio, turnoInicio) {
     xLeyenda += 30;
   });
 
-  // Peu de pàgina amb versió i data de generació
+  // Peu de pàgina amb data de generació
   const pageHeight = doc.internal.pageSize.getHeight();
   const pageWidth = doc.internal.pageSize.getWidth();
 
   doc.setFontSize(8);
   doc.setTextColor(150, 150, 150);
-  doc.text(`Versió ${APP_VERSION}`, margenIzq, pageHeight - 5);
-  doc.text(`Generat: ${new Date().toLocaleDateString('ca-ES')}`, pageWidth - margenDer, pageHeight - 5, { align: 'right' });
+  doc.text(`Generat: ${new Date().toLocaleDateString('ca-ES')}`, pageWidth / 2, pageHeight - 5, { align: 'center' });
 
   // Descargar PDF
   doc.save(`Calendari_Torns_${year}.pdf`);

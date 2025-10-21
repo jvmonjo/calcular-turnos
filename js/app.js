@@ -69,5 +69,13 @@ document.getElementById('exportarICS').addEventListener('click', function() {
   exportarICS(fechaInicio, turnoInicio);
 });
 
+// Mostrar versió al footer
+document.addEventListener('DOMContentLoaded', function() {
+  const versionElement = document.getElementById('app-version');
+  if (versionElement) {
+    versionElement.textContent = `v${APP_VERSION}`;
+  }
+});
+
 // NOTA: El registre del Service Worker ara es gestiona a update-manager.js
 // per poder detectar actualitzacions i notificar l'usuari

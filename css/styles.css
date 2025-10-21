@@ -340,3 +340,17 @@ small {
     width: 100%;
   }
 }
+
+/* Footer amb versió */
+.app-footer {
+  text-align: center;
+  padding: 20px;
+  margin-top: 40px;
+  color: #999;
+  font-size: 0.85em;
+  border-top: 1px solid #eee;
+}
+
+.app-footer #app-version {
+  font-family: 'Courier New', monospace;
+}
