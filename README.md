@@ -1,14 +1,20 @@
 # Calculadora de Torns
 
-Aplicació web progressiva (PWA) per calcular i gestionar torns de treball amb un patró de 28 dies.
+Aplicació web progressiva (PWA) per calcular i gestionar torns de treball amb patrons personalitzables.
 
 ## 🚀 Característiques
 
-- ✅ Càlcul de torns segons un patró personalitzat de 4 setmanes
+- ⚙️ **Configuració Personalitzable**:
+  - Defineix la durada del cicle (de 1 a 365 dies)
+  - Crea els teus propis noms de torns (A, V, L, M, T, N, etc.)
+  - Personalitza el patró de torns segons les teves necessitats
+  - Configuració guardada localment al navegador
+- ✅ Càlcul automàtic de torns per a qualsevol data
 - 📅 Exportació a múltiples formats:
   - **CSV**: Per a fulles de càlcul
-  - **PDF**: Calendari anual visualment elegant en format apaisat
+  - **PDF**: Calendari anual visualment elegant amb colors dinàmics
   - **ICS**: Per a Google Calendar, Apple Calendar, Outlook, etc.
+- 🔄 Suport per a cicles de qualsevol durada (múltiples de 7 i altres)
 - 📱 Progressive Web App (PWA): Instal·lable i funcional sense connexió
 - 🎨 Disseny modern i responsive
 - ⚡ Ràpid i eficient
@@ -24,8 +30,9 @@ calcular-turnos/
 │   └── styles.css          # Estils de l'aplicació
 ├── js/
 │   ├── turnos.js           # Lògica de càlcul de torns
+│   ├── config.js           # Gestió de configuració personalitzable
 │   ├── export-csv.js       # Exportació a CSV
-│   ├── export-pdf.js       # Exportació a PDF
+│   ├── export-pdf.js       # Exportació a PDF amb colors dinàmics
 │   ├── export-ics.js       # Exportació a ICS (iCalendar)
 │   └── app.js              # Inicialització i event listeners
 ├── icons/
@@ -35,26 +42,53 @@ calcular-turnos/
 └── README.md               # Aquest fitxer
 ```
 
-## Patrón de Turnos
+## ⚙️ Configuració de Patrons de Torns
 
-El sistema utiliza un ciclo de 4 semanas con alternancia entre semanas largas y cortas:
+L'aplicació inclou un sistema de configuració flexible que permet personalitzar completament els patrons de torns.
 
-### Semana 1 - Larga A
-- Lunes: A, Martes: L, Miércoles: V, Jueves: L, Viernes: A, Sábado: A, Domingo: A
+### Patró per Defecte (28 dies)
 
-### Semana 2 - Corta V
-- Lunes: L, Martes: V, Miércoles: L, Jueves: A, Viernes: L, Sábado: L, Domingo: L
+El sistema ve configurat amb un cicle de 4 setmanes amb alternància entre setmanes llargues i curtes:
 
-### Semana 3 - Larga V
-- Lunes: V, Martes: L, Miércoles: A, Jueves: L, Viernes: V, Sábado: V, Domingo: V
+**Setmana 1 - Llarga A:** A, L, V, L, A, A, A
+**Setmana 2 - Curta V:** L, V, L, A, L, L, L
+**Setmana 3 - Llarga V:** V, L, A, L, V, V, V
+**Setmana 4 - Curta A:** L, A, L, V, L, L, L
 
-### Semana 4 - Corta A
-- Lunes: L, Martes: A, Miércoles: L, Jueves: V, Viernes: L, Sábado: L, Domingo: L
+**Llegenda:** A = Torn A | V = Torn V | L = Lliure
 
-**Leyenda:**
-- **A**: Turno A
-- **V**: Turno V
-- **L**: Día libre
+### Personalitzar el Patró
+
+Pots crear el teu propi patró de torns:
+
+1. Fes clic a **"Personalizar Patrón"**
+2. Defineix:
+   - **Durada del cicle**: Nombre de dies del patró (ex: 5, 7, 14, 28, etc.)
+   - **Noms dels torns**: Lletres o codis per identificar cada torn (ex: M, T, N, L)
+   - **Patró**: Seqüència de torns separats per comes
+3. Fes clic a **"Guardar Configuración"**
+
+#### Exemples de Configuracions
+
+**Cicle de 5 dies (torn rotatiu de matí/tarda/nit):**
+- Durada: 5
+- Noms: M, T, N, L
+- Patró: M, T, N, L, L
+
+**Cicle de 7 dies (setmana completa):**
+- Durada: 7
+- Noms: A, B, L
+- Patró: A, A, A, B, B, L, L
+
+**Cicle de 14 dies:**
+- Durada: 14
+- Noms: D, N, L
+- Patró: D, D, D, D, D, N, N, N, N, N, L, L, L, L
+
+### Notes Importants
+
+- **Cicles múltiples de 7 dies** (7, 14, 21, 28...): L'algoritme alinea automàticament el patró amb els dies de la setmana
+- **Altres cicles** (5, 6, 10...): La data d'inici ha de correspondre a la primera aparició del torn al patró
 
 ## 🛠️ Instal·lació i Ús
 
@@ -85,16 +119,26 @@ Per desplegar l'aplicació en un servidor web:
 
 ## 📖 Com Funciona
 
+### Càlcul de Torns
+
+1. Configura el patró de torns (o utilitza el per defecte)
+2. Selecciona una **data d'inici** i el **torn** corresponent
+3. Selecciona qualsevol **data futura o passada** per calcular el torn
+4. L'aplicació calcula automàticament quin torn correspon
+
 ### Exportacions
 
 #### CSV
 Format simple de text separat per comes, ideal per importar a Excel o Google Sheets.
+- Conté totes les dates de l'any amb el torn corresponent
+- Compatible amb qualsevol fulls de càlcul
 
 #### PDF
 Calendari anual elegant en format apaisat amb:
 - Tots els 12 mesos en una sola pàgina A4
-- Colors diferenciats per a cada torn (taronja clar per A, taronja intens per V)
-- Llegenda clara i disseny professional
+- **Colors dinàmics** generats automàticament per a cada torn
+- Llegenda adaptativa segons els torns configurats
+- Disseny professional i fàcil de llegir
 
 #### ICS (iCalendar)
 Format estàndard de calendari compatible amb:
@@ -103,16 +147,17 @@ Format estàndard de calendari compatible amb:
 - Microsoft Outlook
 - Qualsevol aplicació compatible amb iCalendar
 
-Els esdeveniments es creen com a "tot el dia" perquè apareguin a la part superior del calendari.
+Els esdeveniments es creen com a "tot el dia" i només s'inclouen els dies de treball (excloent els dies lliures "L").
 
 ## 🔧 Tecnologies Utilitzades
 
 - **HTML5**: Estructura semàntica
 - **CSS3**: Estils moderns amb gradients i animacions
 - **JavaScript (ES6+)**: Lògica de l'aplicació
-- **jsPDF**: Generació de PDFs
-- **Service Worker**: Funcionament offline
-- **Web App Manifest**: PWA
+- **localStorage**: Persistència de configuracions
+- **jsPDF**: Generació de PDFs amb colors dinàmics
+- **Service Worker**: Funcionament offline i caché intel·ligent
+- **Web App Manifest**: PWA completa
 
 ## 📱 Compatibilitat
 
