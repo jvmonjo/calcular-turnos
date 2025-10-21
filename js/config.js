@@ -27,6 +27,14 @@ function inicializarConfiguracion() {
     const duracion = parseInt(this.value);
     document.getElementById('patronTurnos').placeholder =
       `Introduce ${duracion} turnos separados por comas`;
+
+    // Mostrar advertencia si no es múltiplo de 7
+    const mensaje = document.getElementById('configMensaje');
+    if (duracion % 7 !== 0) {
+      mensaje.innerHTML = '<div style="color: orange; margin-top: 10px;">⚠️ Nota: Para ciclos que no son múltiplos de 7 días, la fecha de inicio debe corresponder a la primera aparición del turno en el patrón.</div>';
+    } else {
+      mensaje.innerHTML = '';
+    }
   });
 }
 

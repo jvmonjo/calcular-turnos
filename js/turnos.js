@@ -82,28 +82,45 @@ function calcularIndiceInicio(fechaInicio, turnoInicio, config = null) {
     config = obtenerConfiguracion();
   }
 
-  // Obtener día de la semana (0 = Domingo, 1 = Lunes, ..., 6 = Sábado)
-  let diaSemana = fechaInicio.getDay();
-  // Convertir a formato donde Lunes = 0, Martes = 1, ..., Domingo = 6
-  diaSemana = diaSemana === 0 ? 6 : diaSemana - 1;
+  const duracionCiclo = config.secuenciaTurnos.length;
 
-  // Buscar todas las posiciones donde el día de la semana y el turno coinciden
-  const posiblesIndices = [];
-  for (let i = 0; i < config.secuenciaTurnos.length; i++) {
-    const diaSemanaEnCiclo = i % 7;
-    if (diaSemanaEnCiclo === diaSemana && config.secuenciaTurnos[i] === turnoInicio) {
-      posiblesIndices.push(i);
+  // Si el ciclo es múltiplo de 7, usar el algoritmo basado en día de la semana
+  if (duracionCiclo % 7 === 0) {
+    // Obtener día de la semana (0 = Domingo, 1 = Lunes, ..., 6 = Sábado)
+    let diaSemana = fechaInicio.getDay();
+    // Convertir a formato donde Lunes = 0, Martes = 1, ..., Domingo = 6
+    diaSemana = diaSemana === 0 ? 6 : diaSemana - 1;
+
+    // Buscar todas las posiciones donde el día de la semana y el turno coinciden
+    const posiblesIndices = [];
+    for (let i = 0; i < config.secuenciaTurnos.length; i++) {
+      const diaSemanaEnCiclo = i % 7;
+      if (diaSemanaEnCiclo === diaSemana && config.secuenciaTurnos[i] === turnoInicio) {
+        posiblesIndices.push(i);
+      }
     }
-  }
 
-  // Si solo hay una coincidencia, usarla
-  if (posiblesIndices.length === 1) {
-    return posiblesIndices[0];
-  }
+    // Si solo hay una coincidencia, usarla
+    if (posiblesIndices.length === 1) {
+      return posiblesIndices[0];
+    }
 
-  // Si hay múltiples coincidencias, retornar la primera
-  // (el usuario deberá asegurarse de que la fecha de inicio esté bien configurada)
-  return posiblesIndices.length > 0 ? posiblesIndices[0] : -1;
+    // Si hay múltiples coincidencias, retornar la primera
+    return posiblesIndices.length > 0 ? posiblesIndices[0] : -1;
+  } else {
+    // Para ciclos que no son múltiplos de 7, buscar simplemente el turno
+    // El usuario debe especificar qué posición del ciclo corresponde a la fecha de inicio
+    const indice = config.secuenciaTurnos.indexOf(turnoInicio);
+
+    if (indice === -1) {
+      throw new Error(`El turno "${turnoInicio}" no existe en el patrón configurado`);
+    }
+
+    // Retornar el primer índice donde aparece el turno
+    // NOTA: Para ciclos no múltiplos de 7, el usuario debe asegurarse de que
+    // la fecha de inicio corresponda a la primera aparición del turno en el ciclo
+    return indice;
+  }
 }
 
 /**
