@@ -69,15 +69,5 @@ document.getElementById('exportarICS').addEventListener('click', function() {
   exportarICS(fechaInicio, turnoInicio);
 });
 
-// Registrar Service Worker per a PWA
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then(registration => {
-        console.log('Service Worker registrat correctament:', registration.scope);
-      })
-      .catch(error => {
-        console.log('Error al registrar el Service Worker:', error);
-      });
-  });
-}
+// NOTA: El registre del Service Worker ara es gestiona a update-manager.js
+// per poder detectar actualitzacions i notificar l'usuari

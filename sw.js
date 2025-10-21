@@ -3,7 +3,7 @@
  * Gestiona el caching i el funcionament offline
  */
 
-const CACHE_NAME = 'calculadora-torns-v4';
+const CACHE_NAME = 'calculadora-torns-v5';
 const urlsToCache = [
   './',
   './index.html',
@@ -13,6 +13,7 @@ const urlsToCache = [
   './js/export-csv.js',
   './js/export-pdf.js',
   './js/export-ics.js',
+  './js/update-manager.js',
   './js/app.js',
   './manifest.json',
   'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
@@ -21,11 +22,16 @@ const urlsToCache = [
 
 // Instal·lació del Service Worker
 self.addEventListener('install', event => {
+  console.log('Service Worker instal·lant - versió:', CACHE_NAME);
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('Cache obert');
         return cache.addAll(urlsToCache);
+      })
+      .then(() => {
+        // Forçar que el nou SW esperi fins que s'activi
+        return self.skipWaiting();
       })
   );
 });
@@ -42,8 +48,20 @@ self.addEventListener('activate', event => {
           }
         })
       );
+    }).then(() => {
+      // Prendre control de tots els clients immediatament
+      return self.clients.claim();
     })
   );
+
+  console.log('Service Worker activat - versió:', CACHE_NAME);
+});
+
+// Missatge per comunicar amb la pàgina
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 // Interceptar peticions de xarxa
