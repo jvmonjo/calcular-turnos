@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generar Icones PWA</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #667eea;
+    }
+    .icon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .icon-item {
+      text-align: center;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      margin: 10px 0;
+    }
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    .info {
+      background: #f0f0f0;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Generador d'Icones PWA</h1>
+
+  <div class="info">
+    <p><strong>Instruccions:</strong></p>
+    <ol>
+      <li>Fes clic a "Generar totes les icones"</li>
+      <li>Descarrega cada icona fent clic al botó "Descarregar"</li>
+      <li>Les icones es guardaran a la carpeta de descàrregues</li>
+      <li>Mou-les manualment a la carpeta /icons del projecte</li>
+    </ol>
+  </div>
+
+  <button onclick="generateAllIcons()">Generar totes les icones</button>
+
+  <div class="icon-grid" id="iconGrid"></div>
+
+  <script>
+    const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+
+    function drawIcon(canvas, size) {
+      const ctx = canvas.getContext('2d');
+      canvas.width = size;
+      canvas.height = size;
+
+      // Fondo gradiente
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#667eea');
+      gradient.addColorStop(1, '#764ba2');
+      ctx.fillStyle = gradient;
+
+      // Rectángulo con bordes redondeados
+      const cornerRadius = size * 0.15;
+      ctx.beginPath();
+      ctx.moveTo(cornerRadius, 0);
+      ctx.lineTo(size - cornerRadius, 0);
+      ctx.quadraticCurveTo(size, 0, size, cornerRadius);
+      ctx.lineTo(size, size - cornerRadius);
+      ctx.quadraticCurveTo(size, size, size - cornerRadius, size);
+      ctx.lineTo(cornerRadius, size);
+      ctx.quadraticCurveTo(0, size, 0, size - cornerRadius);
+      ctx.lineTo(0, cornerRadius);
+      ctx.quadraticCurveTo(0, 0, cornerRadius, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      // Calendario
+      const scale = size / 512;
+      const offsetX = size * 0.207;
+      const offsetY = size * 0.207;
+
+      // Marco del calendario
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(offsetX, offsetY + 50 * scale, 300 * scale, 250 * scale);
+
+      // Cabecera
+      ctx.fillStyle = '#f0f0f0';
+      ctx.fillRect(offsetX, offsetY + 80 * scale, 300 * scale, 30 * scale);
+
+      // Anillas
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(offsetX + 60 * scale, offsetY + 20 * scale, 20 * scale, 50 * scale);
+      ctx.fillRect(offsetX + 220 * scale, offsetY + 20 * scale, 20 * scale, 50 * scale);
+
+      // Días de colores
+      const cellSize = 35 * scale;
+      const startX = offsetX + 20 * scale;
+      const startY = offsetY + 130 * scale;
+      const gap = 50 * scale;
+
+      const colors = [
+        ['#ffdcb4', '#ffb78c', '#ffffff', '#ffdcb4', '#ffb78c'],
+        ['#ffffff', '#ffdcb4', '#ffb78c', '#ffffff', '#ffdcb4'],
+        ['#ffb78c', '#ffffff', '#ffdcb4', '#ffb78c', '#ffffff']
+      ];
+
+      for (let row = 0; row < 3; row++) {
+        for (let col = 0; col < 5; col++) {
+          ctx.fillStyle = colors[row][col];
+          ctx.fillRect(
+            startX + col * gap,
+            startY + row * gap,
+            cellSize,
+            cellSize
+          );
+        }
+      }
+
+      // Letras A y V
+      ctx.font = `bold ${20 * scale}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      const letters = [
+        { x: startX + cellSize / 2, y: startY + cellSize / 2 + 3 * scale, text: 'A', color: '#cc6600' },
+        { x: startX + gap + cellSize / 2, y: startY + cellSize / 2 + 3 * scale, text: 'V', color: '#993300' },
+        { x: startX + 3 * gap + cellSize / 2, y: startY + cellSize / 2 + 3 * scale, text: 'A', color: '#cc6600' },
+        { x: startX + 4 * gap + cellSize / 2, y: startY + cellSize / 2 + 3 * scale, text: 'V', color: '#993300' }
+      ];
+
+      letters.forEach(letter => {
+        ctx.fillStyle = letter.color;
+        ctx.fillText(letter.text, letter.x, letter.y);
+      });
+    }
+
+    function downloadCanvas(canvas, filename) {
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    function generateAllIcons() {
+      const grid = document.getElementById('iconGrid');
+      grid.innerHTML = '';
+
+      sizes.forEach(size => {
+        const container = document.createElement('div');
+        container.className = 'icon-item';
+
+        const title = document.createElement('h3');
+        title.textContent = `${size}x${size}`;
+        container.appendChild(title);
+
+        const canvas = document.createElement('canvas');
+        drawIcon(canvas, size);
+        container.appendChild(canvas);
+
+        const downloadBtn = document.createElement('button');
+        downloadBtn.textContent = 'Descarregar';
+        downloadBtn.onclick = () => downloadCanvas(canvas, `icon-${size}x${size}.png`);
+        container.appendChild(downloadBtn);
+
+        grid.appendChild(container);
+      });
+    }
+
+    // Generar automáticamente al cargar
+    window.addEventListener('load', generateAllIcons);
+  </script>
+</body>
+</html>

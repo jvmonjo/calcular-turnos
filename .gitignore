@@ -1,0 +1,29 @@
+# Fitxers de sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Fitxers temporals
+*.tmp
+*.temp
+*.log
+
+# Còpies de seguretat
+index-old.html
+*.backup
+*.bak
+
+# Node modules (per si es necessita en el futur)
+node_modules/
+package-lock.json
+
+# Fitxers de l'editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Fitxers de build (per si s'afegeix en el futur)
+dist/
+build/

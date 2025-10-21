@@ -1,179 +1,26 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="ca">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cálculo de Turnos</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+  <meta name="description" content="Aplicació per calcular i gestionar torns de treball">
+  <meta name="theme-color" content="#667eea">
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
+  <title>Calculadora de Torns</title>
 
-    .container {
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      padding: 40px;
-      max-width: 600px;
-      width: 100%;
-    }
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="./manifest.json">
 
-    h1 {
-      color: #333;
-      text-align: center;
-      margin-bottom: 30px;
-      font-size: 2em;
-      font-weight: 600;
-    }
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
+  <link rel="apple-touch-icon" href="./icons/icon-192x192.png">
 
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      color: #555;
-      font-weight: 500;
-      font-size: 0.95em;
-    }
-
-    input[type="date"],
-    select {
-      width: 100%;
-      padding: 12px 15px;
-      border: 2px solid #e0e0e0;
-      border-radius: 10px;
-      font-size: 1em;
-      transition: all 0.3s ease;
-      background: white;
-    }
-
-    input[type="date"]:focus,
-    select:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-
-    .button-group {
-      display: flex;
-      gap: 10px;
-      margin-top: 25px;
-      flex-wrap: wrap;
-    }
-
-    button {
-      flex: 1;
-      min-width: 140px;
-      padding: 14px 20px;
-      border: none;
-      border-radius: 10px;
-      font-size: 1em;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    button.primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-    }
-
-    button.primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-    }
-
-    button.secondary {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      color: white;
-    }
-
-    button.secondary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(245, 87, 108, 0.3);
-    }
-
-    button.tertiary {
-      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-      color: white;
-    }
-
-    button.tertiary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
-    }
-
-    button:active {
-      transform: translateY(0);
-    }
-
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    #resultado {
-      margin-top: 30px;
-      padding: 20px;
-      background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
-      border-radius: 10px;
-      text-align: center;
-      color: #333;
-      font-weight: 500;
-      font-size: 1.1em;
-      min-height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .export-section {
-      margin-top: 40px;
-      padding-top: 30px;
-      border-top: 2px solid #e0e0e0;
-    }
-
-    .export-section h2 {
-      color: #555;
-      font-size: 1.3em;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    @media (max-width: 600px) {
-      .container {
-        padding: 25px;
-      }
-
-      h1 {
-        font-size: 1.5em;
-      }
-
-      button {
-        min-width: 100%;
-      }
-    }
-  </style>
+  <!-- CSS -->
+  <link rel="stylesheet" href="./css/styles.css">
 </head>
 <body>
   <div class="container">
-    <h1>Calculadora de Turnos</h1>
+    <h1>Calculadora de Torns</h1>
 
     <form id="turnoForm">
       <div class="form-group">
@@ -206,244 +53,20 @@
       <div class="button-group">
         <button id="exportarCSV" class="secondary">Exportar CSV</button>
         <button id="exportarPDF" class="tertiary">Exportar PDF</button>
+        <button id="exportarICS" class="quaternary">Exportar ICS (Calendar)</button>
       </div>
     </div>
   </div>
 
+  <!-- JavaScript Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-  <script>
-    /**
-     * Patrón de turnos de 4 semanas (28 días):
-     * - Semana 1 (Larga A): Dl:A, Dm:L, Dc:V, Dj:L, Dv:A, Ds:A, Dg:A
-     * - Semana 2 (Corta V): Dl:L, Dm:V, Dc:L, Dj:A, Dv:L, Ds:L, Dg:L
-     * - Semana 3 (Larga V): Dl:V, Dm:L, Dc:A, Dj:L, Dv:V, Ds:V, Dg:V
-     * - Semana 4 (Corta A): Dl:L, Dm:A, Dc:L, Dj:V, Dv:L, Ds:L, Dg:L
-     */
-    const secuenciaTurnos = [
-      // Semana 1: Larga A (empieza lunes)
-      "A", "L", "V", "L", "A", "A", "A",
-      // Semana 2: Corta V
-      "L", "V", "L", "A", "L", "L", "L",
-      // Semana 3: Larga V
-      "V", "L", "A", "L", "V", "V", "V",
-      // Semana 4: Corta A
-      "L", "A", "L", "V", "L", "L", "L"
-    ];
 
-    /**
-     * Función para calcular el índice inicial basándose en la fecha de inicio y el turno
-     * @param {Date} fechaInicio - Fecha de inicio
-     * @param {string} turnoInicio - Turno correspondiente a la fecha de inicio
-     * @returns {number} - Índice del turno inicial en el ciclo de 28 días
-     */
-    function calcularIndiceInicio(fechaInicio, turnoInicio) {
-      // Obtener día de la semana (0 = Domingo, 1 = Lunes, ..., 6 = Sábado)
-      let diaSemana = fechaInicio.getDay();
-      // Convertir a formato donde Lunes = 0, Martes = 1, ..., Domingo = 6
-      diaSemana = diaSemana === 0 ? 6 : diaSemana - 1;
-
-      // Buscar todas las posiciones donde el día de la semana y el turno coinciden
-      const posiblesIndices = [];
-      for (let i = 0; i < secuenciaTurnos.length; i++) {
-        const diaSemanaEnCiclo = i % 7;
-        if (diaSemanaEnCiclo === diaSemana && secuenciaTurnos[i] === turnoInicio) {
-          posiblesIndices.push(i);
-        }
-      }
-
-      // Si solo hay una coincidencia, usarla
-      if (posiblesIndices.length === 1) {
-        return posiblesIndices[0];
-      }
-
-      // Si hay múltiples coincidencias, retornar la primera
-      // (el usuario deberá asegurarse de que la fecha de inicio esté bien configurada)
-      return posiblesIndices.length > 0 ? posiblesIndices[0] : -1;
-    }
-
-    /**
-     * Función para calcular el turno que corresponde a una fecha específica
-     * @param {Date} fechaInicio - Fecha de inicio
-     * @param {string} turnoInicio - Turno correspondiente a la fecha de inicio
-     * @param {Date} fechaObjetivo - Fecha para calcular el turno
-     * @returns {string} - Turno correspondiente ('A', 'L' o 'V')
-     */
-    function calcularTurno(fechaInicio, turnoInicio, fechaObjetivo) {
-      // Normalizar fechas a medianoche para evitar problemas con horas
-      const inicio = new Date(fechaInicio);
-      inicio.setHours(0, 0, 0, 0);
-
-      const objetivo = new Date(fechaObjetivo);
-      objetivo.setHours(0, 0, 0, 0);
-
-      // Calcular diferencia en días
-      const diferenciaDias = Math.floor((objetivo - inicio) / (1000 * 60 * 60 * 24));
-
-      // Obtener índice inicial en el ciclo
-      const indiceInicio = calcularIndiceInicio(inicio, turnoInicio);
-
-      if (indiceInicio === -1) {
-        throw new Error("No se pudo determinar el índice inicial. Verifica la fecha y el turno de inicio.");
-      }
-
-      // Calcular índice objetivo en el ciclo de 28 días
-      const totalTurnos = secuenciaTurnos.length; // 28 días
-      let indiceObjetivo = (indiceInicio + diferenciaDias) % totalTurnos;
-
-      // Ajustar para índices negativos (fechas anteriores a la fecha de inicio)
-      if (indiceObjetivo < 0) {
-        indiceObjetivo = totalTurnos + indiceObjetivo;
-      }
-
-      return secuenciaTurnos[indiceObjetivo];
-    }
-
-    // Manejar el envío del formulario
-    document.getElementById('turnoForm').addEventListener('submit', function(event) {
-      event.preventDefault();
-
-      const fechaInicio = new Date(document.getElementById('inicio').value);
-      const turnoInicio = document.getElementById('turnoInicio').value;
-      const fechaObjetivo = new Date(document.getElementById('fecha').value);
-
-      if (isNaN(fechaInicio) || isNaN(fechaObjetivo)) {
-        document.getElementById('resultado').textContent = 'Por favor, introduce fechas válidas.';
-        return;
-      }
-
-      try {
-        const turno = calcularTurno(fechaInicio, turnoInicio, fechaObjetivo);
-        document.getElementById('resultado').textContent = `El turno para el día ${fechaObjetivo.toLocaleDateString()} es: ${turno}`;
-      } catch (error) {
-        document.getElementById('resultado').textContent = error.message;
-      }
-    });
-
-    /**
-     * Genera los datos de turnos para todo un año
-     * @returns {Array} Array de objetos con fecha y turno
-     */
-    function generarTurnosAnuales() {
-      const fechaInicio = new Date(document.getElementById('inicio').value);
-      const turnoInicio = document.getElementById('turnoInicio').value;
-
-      if (isNaN(fechaInicio)) {
-        alert('Por favor, introduce una fecha de inicio válida.');
-        return null;
-      }
-
-      const year = fechaInicio.getFullYear();
-      const turnos = [];
-
-      for (let fechaActual = new Date(year, 0, 1); fechaActual.getFullYear() === year; fechaActual.setDate(fechaActual.getDate() + 1)) {
-        try {
-          const turno = calcularTurno(fechaInicio, turnoInicio, new Date(fechaActual));
-          turnos.push({
-            fecha: new Date(fechaActual),
-            fechaStr: fechaActual.toLocaleDateString('es-ES'),
-            turno: turno
-          });
-        } catch (error) {
-          turnos.push({
-            fecha: new Date(fechaActual),
-            fechaStr: fechaActual.toLocaleDateString('es-ES'),
-            turno: "Error"
-          });
-        }
-      }
-
-      return { year, turnos };
-    }
-
-    // Exportar turnos a CSV
-    document.getElementById('exportarCSV').addEventListener('click', function() {
-      const datos = generarTurnosAnuales();
-      if (!datos) return;
-
-      const { year, turnos } = datos;
-
-      // Crear contenido CSV
-      let csvContent = "Fecha,Turno\n";
-      turnos.forEach(item => {
-        csvContent += `${item.fechaStr},${item.turno}\n`;
-      });
-
-      // Crear blob y descargar
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', `Turnos_${year}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    });
-
-    // Exportar turnos a PDF
-    document.getElementById('exportarPDF').addEventListener('click', function() {
-      const datos = generarTurnosAnuales();
-      if (!datos) return;
-
-      const { year, turnos } = datos;
-
-      // Crear documento PDF
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-
-      // Título
-      doc.setFontSize(18);
-      doc.text(`Turnos del año ${year}`, 14, 20);
-
-      // Agrupar datos por mes
-      const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-                     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-
-      const turnosPorMes = {};
-      turnos.forEach(item => {
-        const mes = item.fecha.getMonth();
-        if (!turnosPorMes[mes]) {
-          turnosPorMes[mes] = [];
-        }
-        turnosPorMes[mes].push([item.fechaStr, item.turno]);
-      });
-
-      let yPosition = 30;
-
-      // Generar tabla para cada mes
-      for (let mes = 0; mes < 12; mes++) {
-        if (turnosPorMes[mes]) {
-          // Verificar si necesitamos una nueva página
-          if (yPosition > 250) {
-            doc.addPage();
-            yPosition = 20;
-          }
-
-          doc.setFontSize(12);
-          doc.text(meses[mes], 14, yPosition);
-
-          doc.autoTable({
-            startY: yPosition + 5,
-            head: [['Fecha', 'Turno']],
-            body: turnosPorMes[mes],
-            theme: 'grid',
-            headStyles: { fillColor: [102, 126, 234] },
-            margin: { left: 14 },
-            styles: { fontSize: 8, cellPadding: 2 },
-            columnStyles: {
-              0: { cellWidth: 40 },
-              1: { cellWidth: 20, halign: 'center' }
-            }
-          });
-
-          yPosition = doc.lastAutoTable.finalY + 10;
-        }
-      }
-
-      // Descargar PDF
-      doc.save(`Turnos_${year}.pdf`);
-    });
-  </script>
+  <!-- Application JavaScript -->
+  <script src="./js/turnos.js"></script>
+  <script src="./js/export-csv.js"></script>
+  <script src="./js/export-pdf.js"></script>
+  <script src="./js/export-ics.js"></script>
+  <script src="./js/app.js"></script>
 </body>
 </html>

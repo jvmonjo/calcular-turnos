@@ -1,14 +1,39 @@
-# Calculadora de Turnos
+# Calculadora de Torns
 
-Aplicación web para calcular y gestionar turnos de trabajo basados en un patrón cíclico de 4 semanas (28 días).
+Aplicació web progressiva (PWA) per calcular i gestionar torns de treball amb un patró de 28 dies.
 
-## Características
+## 🚀 Característiques
 
-- **Cálculo de turnos**: Calcula el turno correspondiente a cualquier fecha basándose en una fecha de inicio y su turno asociado
-- **Interfaz moderna**: Diseño responsive con gradientes y animaciones suaves
-- **Exportación múltiple**:
-  - Exportar calendario anual completo en formato CSV
-  - Exportar calendario anual completo en formato PDF (organizado por meses)
+- ✅ Càlcul de torns segons un patró personalitzat de 4 setmanes
+- 📅 Exportació a múltiples formats:
+  - **CSV**: Per a fulles de càlcul
+  - **PDF**: Calendari anual visualment elegant en format apaisat
+  - **ICS**: Per a Google Calendar, Apple Calendar, Outlook, etc.
+- 📱 Progressive Web App (PWA): Instal·lable i funcional sense connexió
+- 🎨 Disseny modern i responsive
+- ⚡ Ràpid i eficient
+
+## 📁 Estructura del Projecte
+
+```
+calcular-turnos/
+├── index.html              # Pàgina principal
+├── manifest.json           # Manifest de la PWA
+├── sw.js                   # Service Worker per a funcionament offline
+├── css/
+│   └── styles.css          # Estils de l'aplicació
+├── js/
+│   ├── turnos.js           # Lògica de càlcul de torns
+│   ├── export-csv.js       # Exportació a CSV
+│   ├── export-pdf.js       # Exportació a PDF
+│   ├── export-ics.js       # Exportació a ICS (iCalendar)
+│   └── app.js              # Inicialització i event listeners
+├── icons/
+│   ├── icon.svg            # Icona vectorial
+│   ├── generate-icons.html # Generador d'icones PNG
+│   └── README.md           # Instruccions per generar icones
+└── README.md               # Aquest fitxer
+```
 
 ## Patrón de Turnos
 
@@ -31,51 +56,90 @@ El sistema utiliza un ciclo de 4 semanas con alternancia entre semanas largas y 
 - **V**: Turno V
 - **L**: Día libre
 
-## Uso
+## 🛠️ Instal·lació i Ús
 
-1. **Configurar fecha de inicio**: Selecciona una fecha de referencia
-2. **Seleccionar turno inicial**: Indica qué turno (A o V) corresponde a esa fecha
-3. **Calcular turnos**:
-   - Para una fecha específica: introduce la fecha y haz clic en "Calcular Turno"
-   - Para todo el año: utiliza los botones de exportación
+### Ús Local
 
-## Exportación
+1. Clona o descarrega el projecte
+2. Obre `icons/generate-icons.html` en un navegador
+3. Descarrega totes les icones generades i desa-les a la carpeta `icons/`
+4. Obre `index.html` en un navegador web
+5. L'aplicació ja està llesta per utilitzar!
 
-### CSV
-Genera un archivo CSV simple con dos columnas:
-- Fecha
-- Turno
+### Instal·lar com a PWA
 
-Compatible con Excel, Google Sheets y otras aplicaciones de hoja de cálculo.
+1. Obre l'aplicació en Chrome, Edge o Safari
+2. Fes clic a la icona d'instal·lar a la barra d'adreces
+3. Confirma la instal·lació
+4. L'aplicació s'afegirà al teu escriptori/pantalla d'inici
+5. Poràs utilitzar-la sense connexió a Internet!
 
-### PDF
-Genera un documento PDF profesional con:
-- Título con el año
-- Datos organizados por meses
-- Tablas formateadas con colores
-- Paginación automática
+### Desplegar en un Servidor
 
-## Tecnologías
+Per desplegar l'aplicació en un servidor web:
 
-- HTML5
-- CSS3 (con gradientes y animaciones)
-- JavaScript vanilla
-- [jsPDF](https://github.com/parallax/jsPDF) - Generación de PDFs
-- [jsPDF-AutoTable](https://github.com/simonbengtsson/jsPDF-AutoTable) - Tablas en PDF
+1. Puja tots els fitxers a un servidor web (Apache, Nginx, GitHub Pages, etc.)
+2. Assegura't que el servidor serveix els fitxers amb HTTPS (requerit per a PWA)
+3. Accedeix a la URL del servidor
+4. L'aplicació estarà disponible i instal·lable com a PWA
 
-## Instalación
+## 📖 Com Funciona
 
-No requiere instalación. Simplemente abre el archivo `index.html` en tu navegador web.
+### Exportacions
 
-## Compatibilidad
+#### CSV
+Format simple de text separat per comes, ideal per importar a Excel o Google Sheets.
 
-- Chrome/Edge (recomendado)
-- Firefox
-- Safari
-- Opera
+#### PDF
+Calendari anual elegant en format apaisat amb:
+- Tots els 12 mesos en una sola pàgina A4
+- Colors diferenciats per a cada torn (taronja clar per A, taronja intens per V)
+- Llegenda clara i disseny professional
 
-Funciona en dispositivos móviles y tablets con diseño responsive.
+#### ICS (iCalendar)
+Format estàndard de calendari compatible amb:
+- Google Calendar
+- Apple Calendar
+- Microsoft Outlook
+- Qualsevol aplicació compatible amb iCalendar
 
-## Licencia
+Els esdeveniments es creen com a "tot el dia" perquè apareguin a la part superior del calendari.
 
-Proyecto de uso libre.
+## 🔧 Tecnologies Utilitzades
+
+- **HTML5**: Estructura semàntica
+- **CSS3**: Estils moderns amb gradients i animacions
+- **JavaScript (ES6+)**: Lògica de l'aplicació
+- **jsPDF**: Generació de PDFs
+- **Service Worker**: Funcionament offline
+- **Web App Manifest**: PWA
+
+## 📱 Compatibilitat
+
+- ✅ Chrome/Edge (versió 67+)
+- ✅ Firefox (versió 63+)
+- ✅ Safari (versió 11.1+)
+- ✅ Opera (versió 54+)
+- ✅ Dispositius mòbils (iOS i Android)
+
+## 🤝 Contribuir
+
+Les contribucions són benvingudes! Si vols millorar l'aplicació:
+
+1. Fes un fork del projecte
+2. Crea una branca per a la teva funcionalitat (`git checkout -b feature/nova-funcionalitat`)
+3. Fes commit dels canvis (`git commit -m 'Afegir nova funcionalitat'`)
+4. Puja els canvis (`git push origin feature/nova-funcionalitat`)
+5. Obre un Pull Request
+
+## 📄 Llicència
+
+Aquest projecte és de codi obert i està disponible sota la llicència MIT.
+
+## 📧 Contacte
+
+Per a preguntes o suggeriments, si us plau obre un issue al repositori.
+
+---
+
+Fet amb ❤️ per facilitar la gestió de torns de treball
