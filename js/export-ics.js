@@ -64,7 +64,7 @@ function exportarICS(fechaInicio, turnoInicio) {
       fechaFin.setDate(fechaFin.getDate() + 1);
       const fechaFinStr = formatearFechaICS(fechaFin);
 
-      const nombreTurno = `Torn ${item.turno}`;
+      const nombreTurno = `${item.turno}`;
       const descripcion = `${nombreTurno} - Jornada de treball`;
 
       icsContent += 'BEGIN:VEVENT\r\n';
