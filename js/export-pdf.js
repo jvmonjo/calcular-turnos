@@ -9,19 +9,16 @@
  * @param {string} turnoInicio - Turno correspondiente a la fecha de inicio
  */
 function exportarPDF(fechaInicio, turnoInicio) {
-  const datos = generarTurnosAnuales(fechaInicio, turnoInicio);
+  const config = obtenerConfiguracion();
+  const datos = generarTurnosAnuales(fechaInicio, turnoInicio, config);
   const { year, turnos } = datos;
 
   // Crear documento PDF en formato apaisado
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('landscape', 'mm', 'a4');
 
-  // Configuración de colores
-  const colores = {
-    'A': [255, 220, 180], // Taronja clar
-    'V': [255, 183, 140], // Taronja més intens
-    'L': [255, 255, 255]  // Blanco
-  };
+  // Generar colores dinámicamente para cada turno
+  const colores = generarColoresTurnos(config.nombresTurnos);
 
   // Nombres de meses
   const nombresMeses = ['Gener', 'Febrer', 'Març', 'Abril', 'Maig', 'Juny',
@@ -129,37 +126,68 @@ function exportarPDF(fechaInicio, turnoInicio) {
   doc.setTextColor(60, 60, 60);
   doc.text('Llegenda:', margenIzq, yLeyenda);
 
-  // Cuadro A
-  doc.setFillColor(255, 220, 180);
-  doc.setDrawColor(200, 200, 200);
-  doc.rect(margenIzq + 25, yLeyenda - 3, 8, 5, 'FD');
-  doc.setTextColor(204, 102, 0);
-  doc.setFont(undefined, 'bold');
-  doc.text('A', margenIzq + 29, yLeyenda + 1, { align: 'center' });
-  doc.setTextColor(60, 60, 60);
-  doc.setFont(undefined, 'normal');
-  doc.text('Torn A', margenIzq + 35, yLeyenda);
+  // Dibujar leyenda dinámicamente según los turnos configurados
+  let xLeyenda = margenIzq + 25;
+  config.nombresTurnos.forEach((turno, index) => {
+    const color = colores[turno];
+    const colorTexto = obtenerColorTexto(color);
 
-  // Cuadro V
-  doc.setFillColor(255, 183, 140);
-  doc.rect(margenIzq + 55, yLeyenda - 3, 8, 5, 'FD');
-  doc.setTextColor(153, 51, 0);
-  doc.setFont(undefined, 'bold');
-  doc.text('V', margenIzq + 59, yLeyenda + 1, { align: 'center' });
-  doc.setTextColor(60, 60, 60);
-  doc.setFont(undefined, 'normal');
-  doc.text('Torn V', margenIzq + 65, yLeyenda);
+    doc.setFillColor(color[0], color[1], color[2]);
+    doc.setDrawColor(200, 200, 200);
+    doc.rect(xLeyenda, yLeyenda - 3, 8, 5, 'FD');
+    doc.setTextColor(colorTexto[0], colorTexto[1], colorTexto[2]);
+    doc.setFont(undefined, 'bold');
+    doc.text(turno, xLeyenda + 4, yLeyenda + 1, { align: 'center' });
+    doc.setTextColor(60, 60, 60);
+    doc.setFont(undefined, 'normal');
+    doc.text(`Torn ${turno}`, xLeyenda + 10, yLeyenda);
 
-  // Cuadro L
-  doc.setFillColor(255, 255, 255);
-  doc.rect(margenIzq + 85, yLeyenda - 3, 8, 5, 'FD');
-  doc.setTextColor(150, 150, 150);
-  doc.setFont(undefined, 'bold');
-  doc.text('L', margenIzq + 89, yLeyenda + 1, { align: 'center' });
-  doc.setTextColor(60, 60, 60);
-  doc.setFont(undefined, 'normal');
-  doc.text('Lliure', margenIzq + 95, yLeyenda);
+    xLeyenda += 30;
+  });
 
   // Descargar PDF
   doc.save(`Calendari_Torns_${year}.pdf`);
+}
+
+/**
+ * Genera colores automáticamente para cada turno
+ */
+function generarColoresTurnos(nombresTurnos) {
+  const coloresPredefinidos = {
+    'A': [255, 220, 180],
+    'V': [255, 183, 140],
+    'L': [255, 255, 255],
+    'M': [180, 220, 255],
+    'N': [220, 180, 255],
+    'T': [180, 255, 220]
+  };
+
+  const colores = {};
+  const coloresBase = [
+    [255, 200, 200], [200, 255, 200], [200, 200, 255],
+    [255, 255, 200], [255, 200, 255], [200, 255, 255],
+    [255, 180, 180], [180, 255, 180], [180, 180, 255]
+  ];
+
+  nombresTurnos.forEach((turno, index) => {
+    if (coloresPredefinidos[turno]) {
+      colores[turno] = coloresPredefinidos[turno];
+    } else {
+      colores[turno] = coloresBase[index % coloresBase.length];
+    }
+  });
+
+  return colores;
+}
+
+/**
+ * Obtiene el color de texto apropiado según el color de fondo
+ */
+function obtenerColorTexto(colorFondo) {
+  // Si el color es muy claro, usar texto oscuro
+  const luminancia = (colorFondo[0] * 0.299 + colorFondo[1] * 0.587 + colorFondo[2] * 0.114);
+  if (luminancia > 186) {
+    return [60, 60, 60]; // Texto oscuro
+  }
+  return [255, 255, 255]; // Texto claro
 }

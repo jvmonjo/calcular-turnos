@@ -36,7 +36,8 @@ function formatearFechaHoraICS(fecha) {
  * @param {string} turnoInicio - Turno correspondiente a la fecha de inicio
  */
 function exportarICS(fechaInicio, turnoInicio) {
-  const datos = generarTurnosAnuales(fechaInicio, turnoInicio);
+  const config = obtenerConfiguracion();
+  const datos = generarTurnosAnuales(fechaInicio, turnoInicio, config);
   const { year, turnos } = datos;
 
   // Generar contenido ICS
@@ -52,8 +53,9 @@ function exportarICS(fechaInicio, turnoInicio) {
   const ahora = new Date();
   const dtstamp = formatearFechaHoraICS(ahora);
 
-  // Solo incluir eventos de turnos A y V (no los días libres)
+  // Solo incluir eventos de turnos (excluir días libres si existe 'L')
   turnos.forEach((item, index) => {
+    // Excluir solo si el turno es 'L' (libre)
     if (item.turno !== 'L') {
       const fechaInicioEvento = formatearFechaICS(item.fecha);
 
@@ -62,10 +64,8 @@ function exportarICS(fechaInicio, turnoInicio) {
       fechaFin.setDate(fechaFin.getDate() + 1);
       const fechaFinStr = formatearFechaICS(fechaFin);
 
-      const nombreTurno = item.turno === 'A' ? 'Torn A' : 'Torn V';
-      const descripcion = item.turno === 'A' ?
-        'Torn A - Jornada de treball' :
-        'Torn V - Jornada de treball';
+      const nombreTurno = `Torn ${item.turno}`;
+      const descripcion = `${nombreTurno} - Jornada de treball`;
 
       icsContent += 'BEGIN:VEVENT\r\n';
       icsContent += 'UID:' + year + '-' + fechaInicioEvento + '-' + item.turno + '-' + index + '@calculadora-torns\r\n';

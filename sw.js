@@ -3,12 +3,13 @@
  * Gestiona el caching i el funcionament offline
  */
 
-const CACHE_NAME = 'calculadora-torns-v2';
+const CACHE_NAME = 'calculadora-torns-v3';
 const urlsToCache = [
   './',
   './index.html',
   './css/styles.css',
   './js/turnos.js',
+  './js/config.js',
   './js/export-csv.js',
   './js/export-pdf.js',
   './js/export-ics.js',

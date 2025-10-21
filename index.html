@@ -22,6 +22,37 @@
   <div class="container">
     <h1>Calculadora de Turnos</h1>
 
+    <div class="config-section">
+      <h2>Configuración del Patrón de Turnos</h2>
+      <button id="toggleConfig" class="secondary">Personalizar Patrón</button>
+
+      <div id="configPanel" style="display: none;">
+        <div class="form-group">
+          <label for="duracionCiclo">Duración del ciclo (días):</label>
+          <input type="number" id="duracionCiclo" min="1" max="365" value="28">
+        </div>
+
+        <div class="form-group">
+          <label>Nombres de los turnos (separados por comas):</label>
+          <input type="text" id="nombresTurnos" value="A,V,L" placeholder="Ej: A,V,L">
+          <small>Por defecto: A=Azul, V=Verde, L=Libre</small>
+        </div>
+
+        <div class="form-group">
+          <label for="patronTurnos">Patrón de turnos (usa los nombres definidos arriba):</label>
+          <textarea id="patronTurnos" rows="4" placeholder="Introduce el patrón separado por comas">A,L,V,L,A,A,A,L,V,L,A,L,L,L,V,L,A,L,V,V,V,L,A,L,V,L,L,L</textarea>
+          <small>Debe tener exactamente la misma cantidad de días que la duración del ciclo</small>
+        </div>
+
+        <div class="button-group">
+          <button type="button" id="guardarConfig" class="primary">Guardar Configuración</button>
+          <button type="button" id="resetConfig" class="tertiary">Restaurar Por Defecto</button>
+        </div>
+
+        <div id="configMensaje"></div>
+      </div>
+    </div>
+
     <form id="turnoForm">
       <div class="form-group">
         <label for="inicio">Fecha de inicio:</label>
@@ -31,8 +62,7 @@
       <div class="form-group">
         <label for="turnoInicio">Turno correspondiente a la fecha de inicio:</label>
         <select id="turnoInicio" required>
-          <option value="A">A</option>
-          <option value="V">V</option>
+          <!-- Se poblará dinámicamente según la configuración -->
         </select>
       </div>
 
@@ -64,6 +94,7 @@
 
   <!-- Application JavaScript -->
   <script src="./js/turnos.js"></script>
+  <script src="./js/config.js"></script>
   <script src="./js/export-csv.js"></script>
   <script src="./js/export-pdf.js"></script>
   <script src="./js/export-ics.js"></script>
