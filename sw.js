@@ -3,7 +3,7 @@
  * Gestiona el caching i el funcionament offline
  */
 
-const CACHE_NAME = 'calculadora-torns-v5';
+const CACHE_NAME = 'calculadora-torns-v6';
 const urlsToCache = [
   './',
   './index.html',
