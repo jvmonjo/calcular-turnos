@@ -7,9 +7,12 @@
 document.getElementById('turnoForm').addEventListener('submit', function(event) {
   event.preventDefault();
 
-  const fechaInicio = new Date(document.getElementById('inicio').value);
+  // Leer las fechas y crear objetos Date en hora local
+  const inicioValue = document.getElementById('inicio').value;
+  const fechaInicio = new Date(inicioValue + 'T00:00:00');
   const turnoInicio = document.getElementById('turnoInicio').value;
-  const fechaObjetivo = new Date(document.getElementById('fecha').value);
+  const objetivoValue = document.getElementById('fecha').value;
+  const fechaObjetivo = new Date(objetivoValue + 'T00:00:00');
 
   if (isNaN(fechaInicio) || isNaN(fechaObjetivo)) {
     document.getElementById('resultado').textContent = 'Por favor, introduce fechas válidas.';
@@ -26,7 +29,8 @@ document.getElementById('turnoForm').addEventListener('submit', function(event) 
 
 // Exportar turnos a CSV
 document.getElementById('exportarCSV').addEventListener('click', function() {
-  const fechaInicio = new Date(document.getElementById('inicio').value);
+  const inicioValue = document.getElementById('inicio').value;
+  const fechaInicio = new Date(inicioValue + 'T00:00:00');
   const turnoInicio = document.getElementById('turnoInicio').value;
 
   if (isNaN(fechaInicio)) {
@@ -39,7 +43,8 @@ document.getElementById('exportarCSV').addEventListener('click', function() {
 
 // Exportar turnos a PDF
 document.getElementById('exportarPDF').addEventListener('click', function() {
-  const fechaInicio = new Date(document.getElementById('inicio').value);
+  const inicioValue = document.getElementById('inicio').value;
+  const fechaInicio = new Date(inicioValue + 'T00:00:00');
   const turnoInicio = document.getElementById('turnoInicio').value;
 
   if (isNaN(fechaInicio)) {
@@ -52,7 +57,8 @@ document.getElementById('exportarPDF').addEventListener('click', function() {
 
 // Exportar turnos a ICS
 document.getElementById('exportarICS').addEventListener('click', function() {
-  const fechaInicio = new Date(document.getElementById('inicio').value);
+  const inicioValue = document.getElementById('inicio').value;
+  const fechaInicio = new Date(inicioValue + 'T00:00:00');
   const turnoInicio = document.getElementById('turnoInicio').value;
 
   if (isNaN(fechaInicio)) {

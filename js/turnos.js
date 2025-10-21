@@ -67,8 +67,10 @@ function calcularTurno(fechaInicio, turnoInicio, fechaObjetivo) {
   const objetivo = new Date(fechaObjetivo);
   objetivo.setHours(0, 0, 0, 0);
 
-  // Calcular diferencia en días
-  const diferenciaDias = Math.floor((objetivo - inicio) / (1000 * 60 * 60 * 24));
+  // Calcular diferencia en días usando UTC para evitar problemas con cambio de hora
+  const inicioUTC = Date.UTC(inicio.getFullYear(), inicio.getMonth(), inicio.getDate());
+  const objetivoUTC = Date.UTC(objetivo.getFullYear(), objetivo.getMonth(), objetivo.getDate());
+  const diferenciaDias = Math.floor((objetivoUTC - inicioUTC) / (1000 * 60 * 60 * 24));
 
   // Obtener índice inicial en el ciclo
   const indiceInicio = calcularIndiceInicio(inicio, turnoInicio);
@@ -99,9 +101,15 @@ function generarTurnosAnuales(fechaInicio, turnoInicio) {
   const year = fechaInicio.getFullYear();
   const turnos = [];
 
-  for (let fechaActual = new Date(year, 0, 1); fechaActual.getFullYear() === year; fechaActual.setDate(fechaActual.getDate() + 1)) {
+  // Crear una fecha temporal para iterar
+  const fechaActual = new Date(year, 0, 1);
+
+  while (fechaActual.getFullYear() === year) {
     try {
-      const turno = calcularTurno(fechaInicio, turnoInicio, new Date(fechaActual));
+      // Crear una copia de la fecha actual para pasarla a calcularTurno
+      const fechaCopia = new Date(fechaActual);
+      const turno = calcularTurno(fechaInicio, turnoInicio, fechaCopia);
+
       turnos.push({
         fecha: new Date(fechaActual),
         fechaStr: fechaActual.toLocaleDateString('es-ES'),
@@ -114,6 +122,9 @@ function generarTurnosAnuales(fechaInicio, turnoInicio) {
         turno: "Error"
       });
     }
+
+    // Avanzar al día siguiente
+    fechaActual.setDate(fechaActual.getDate() + 1);
   }
 
   return { year, turnos };

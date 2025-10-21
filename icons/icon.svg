@@ -19,8 +19,8 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:zoom="1.2402344"
-     inkscape:cx="256"
-     inkscape:cy="256"
+     inkscape:cx="255.99999"
+     inkscape:cy="255.99999"
      inkscape:window-width="1600"
      inkscape:window-height="837"
      inkscape:window-x="-8"
@@ -54,7 +54,7 @@
      id="rect2" />
   <!-- Icono de calendario -->
   <g
-     transform="matrix(1.6007365,0,0,1.6007365,13.299067,-14.058827)"
+     transform="matrix(1.6007365,0,0,1.6007365,15.889525,-1.7185765)"
      id="g25">
     <!-- Marco del calendario -->
     <rect
