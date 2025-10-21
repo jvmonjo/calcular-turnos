@@ -1,14 +1,36 @@
 /**
  * Gestor d'actualitzacions de la PWA
  * Detecta quan hi ha una nova versió disponible i notifica l'usuari
+ * Compatible amb Safari/iOS utilitzant localStorage per detectar canvis
  */
 
 let newWorker = null;
 
 /**
+ * Comprova si hi ha una nova versió disponible (mètode Safari/iOS compatible)
+ */
+function comprovarVersioLocalStorage() {
+  const versioActual = APP_VERSION;
+  const versioGuardada = localStorage.getItem('app_version');
+
+  console.log('Versió actual:', versioActual, '| Versió guardada:', versioGuardada);
+
+  if (versioGuardada && versioGuardada !== versioActual) {
+    console.log('Nova versió detectada via localStorage');
+    mostrarNotificacioActualitzacio(true);
+  }
+
+  // Guardar la versió actual
+  localStorage.setItem('app_version', versioActual);
+}
+
+/**
  * Inicialitza el gestor d'actualitzacions
  */
 function initUpdateManager() {
+  // Comprovar versió amb localStorage (funciona a Safari/iOS)
+  comprovarVersioLocalStorage();
+
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js')
       .then(registration => {
@@ -23,7 +45,7 @@ function initUpdateManager() {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
               // Hi ha una nova versió disponible
               console.log('Nova versió instal·lada i esperant');
-              mostrarNotificacioActualitzacio();
+              mostrarNotificacioActualitzacio(false);
             }
           });
         });
@@ -54,8 +76,14 @@ function initUpdateManager() {
 
 /**
  * Mostra la notificació d'actualització
+ * @param {boolean} forceReload - Si és true, força recàrrega immediata (Safari/iOS)
  */
-function mostrarNotificacioActualitzacio() {
+function mostrarNotificacioActualitzacio(forceReload = false) {
+  // Evitar mostrar múltiples banners
+  if (document.getElementById('update-banner')) {
+    return;
+  }
+
   // Crear el banner de notificació
   const banner = document.createElement('div');
   banner.id = 'update-banner';
@@ -77,7 +105,11 @@ function mostrarNotificacioActualitzacio() {
 
   // Event listeners
   document.getElementById('update-reload').addEventListener('click', () => {
-    if (newWorker) {
+    if (forceReload || !newWorker) {
+      // Recàrrega forçada per Safari/iOS o si no hi ha Service Worker
+      window.location.reload(true);
+    } else if (newWorker) {
+      // Activar nou Service Worker
       newWorker.postMessage({ type: 'SKIP_WAITING' });
     }
   });
