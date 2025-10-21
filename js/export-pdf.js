@@ -88,7 +88,19 @@ function exportarPDF(fechaInicio, turnoInicio) {
 
           if (turnoData) {
             // Color de fondo según el turno
-            const color = colores[turnoData.turno];
+            let color = colores[turnoData.turno];
+
+            // Enfosquir les cel·les dels caps de setmana
+            const esCapDeSetmana = turnoData.diaSemana === 0 || turnoData.diaSemana === 6;
+            if (esCapDeSetmana) {
+              // Enfosquir el color restant un 15% a cada component RGB
+              color = [
+                Math.max(0, color[0] - 40),
+                Math.max(0, color[1] - 40),
+                Math.max(0, color[2] - 40)
+              ];
+            }
+
             doc.setFillColor(color[0], color[1], color[2]);
             doc.setDrawColor(200, 200, 200);
             doc.rect(x, yPos, anchoCelda, altoCelda, 'FD');
