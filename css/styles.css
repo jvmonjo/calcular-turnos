@@ -4,9 +4,21 @@
   box-sizing: border-box;
 }
 
+:root {
+  /* Brand palette from logo */
+  --brand-900: #4a1a00;
+  --brand-800: #7a2e00;
+  --brand-700: #993300;
+  --brand-600: #cc6600;
+  --brand-400: #ffb78c;
+  --brand-300: #ffd0a8;
+  --brand-200: #ffdcb4;
+  --brand-100: #fff1e6;
+}
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-color: var(--brand-100);
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -60,8 +72,8 @@ select {
 input[type="date"]:focus,
 select:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: var(--brand-600);
+  box-shadow: 0 0 0 3px rgba(204, 102, 0, 0.12);
 }
 
 .button-group {
@@ -86,43 +98,31 @@ button {
 }
 
 button.primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--brand-600);
   color: white;
 }
 
 button.primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+  background: var(--brand-700);
+  box-shadow: 0 10px 20px rgba(153, 51, 0, 0.25);
 }
 
-button.secondary {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  color: white;
-}
-
-button.secondary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(245, 87, 108, 0.3);
-}
-
-button.tertiary {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  color: white;
-}
-
-button.tertiary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
-}
-
+/* Unify all non-primary buttons into a single secondary style */
+button.secondary,
+button.tertiary,
 button.quaternary {
-  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-  color: white;
+  background: #f3f4f6;
+  color: var(--brand-800);
+  border: 1.5px solid #e5e7eb;
 }
 
+button.secondary:hover,
+button.tertiary:hover,
 button.quaternary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(67, 233, 123, 0.3);
+  background: #eaecef;
+  border-color: var(--brand-300);
 }
 
 button:active {
@@ -137,7 +137,7 @@ button:disabled {
 #resultado {
   margin-top: 30px;
   padding: 20px;
-  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+  background: linear-gradient(135deg, rgba(153, 51, 0, 0.08) 0%, rgba(255, 183, 140, 0.08) 100%);
   border-radius: 10px;
   text-align: center;
   color: #333;
@@ -186,8 +186,8 @@ input[type="number"]:focus,
 input[type="text"]:focus,
 textarea:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: var(--brand-600);
+  box-shadow: 0 0 0 3px rgba(204, 102, 0, 0.12);
 }
 
 textarea {
@@ -290,13 +290,14 @@ small {
 }
 
 .update-btn.primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--brand-600);
   color: white;
 }
 
 .update-btn.primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+  background: var(--brand-700);
+  box-shadow: 0 5px 15px rgba(153, 51, 0, 0.35);
 }
 
 .update-btn.secondary {
