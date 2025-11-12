@@ -1,30 +1,12 @@
 #!/bin/sh
 
-# Git hook pre-commit per incrementar automàticament la versió
+# Pre-commit: el bump de versió es decidirà segons el missatge
+# al hook commit-msg i s'inclourà mitjançant un amend del commit.
 
-# Colors per a la sortida
-RED='\033[0;31m'
-GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-echo "${YELLOW}🔄 Incrementant versió automàticament...${NC}"
-
-# Executar script per incrementar versió patch
-node scripts/bump-version.js patch
-
-# Verificar si el script va tenir èxit
-if [ $? -eq 0 ]; then
-  echo "${GREEN}✓ Versió incrementada correctament${NC}"
-
-  # Afegir els fitxers modificats al commit
-  git add package.json
-  git add js/version.js
-
-  echo "${GREEN}✓ Fitxers de versió afegits al commit${NC}"
-else
-  echo "${RED}✗ Error incrementant la versió${NC}"
-  exit 1
-fi
+echo "${YELLOW}ℹ️ La versió es gestionarà al commit-msg segons el missatge.${NC}"
 
 exit 0
+

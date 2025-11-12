@@ -1,0 +1,57 @@
+#!/bin/sh
+
+# Hook commit-msg: decideix el tipus de bump (major/minor/patch)
+# segons el missatge de commit i amenda el commit per incloure
+# els canvis de versió (package.json i js/version.js).
+
+MSG_FILE="$1"
+
+# Si no hi ha fitxer de missatge, res a fer
+if [ -z "$MSG_FILE" ] || [ ! -f "$MSG_FILE" ]; then
+  exit 0
+fi
+
+# Evitar recursió quan fem --amend
+if [ "$GIT_AMEND_VERSION_BUMPED" = "1" ]; then
+  exit 0
+fi
+
+MSG_CONTENT="$(cat "$MSG_FILE")"
+
+# Ometre merges o reverts
+case "$MSG_CONTENT" in
+  Merge\ *|Revert\ *)
+    exit 0
+    ;;
+esac
+
+TYPE="patch"
+
+# Major si té BREAKING CHANGE(S) o tipus amb ! (p.ex. feat!:)
+echo "$MSG_CONTENT" | grep -qiE 'BREAKING CHANGE|BREAKING CHANGES' && TYPE="major"
+if [ "$TYPE" != "major" ]; then
+  echo "$MSG_CONTENT" | head -n1 | grep -qiE '^[a-z]+(\([^)]+\))?!:' && TYPE="major"
+fi
+
+# Minor si comença per feat
+if [ "$TYPE" != "major" ]; then
+  echo "$MSG_CONTENT" | head -n1 | grep -qiE '^feat(\([^)]+\))?:' && TYPE="minor"
+fi
+
+echo "Decidint increment de versió segons el missatge: $TYPE"
+
+# Executar el bump
+node scripts/bump-version.js "$TYPE"
+STATUS=$?
+if [ $STATUS -ne 0 ]; then
+  echo "Error durant el bump de versió"
+  exit 1
+fi
+
+# Afegir els canvis i amendar el commit
+git add package.json js/version.js
+
+GIT_AMEND_VERSION_BUMPED=1 git commit --amend --no-edit || exit 1
+
+exit 0
+

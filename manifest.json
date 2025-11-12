@@ -4,8 +4,8 @@
   "description": "Aplicación para calcular y gestionar turnos de trabajo",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#667eea",
-  "theme_color": "#667eea",
+  "background_color": "#cc6600",
+  "theme_color": "#cc6600",
   "orientation": "portrait-primary",
   "icons": [
     {
