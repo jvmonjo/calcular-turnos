@@ -17,7 +17,7 @@ try {
 
   // Fer executables els hooks (només en sistemes Unix)
   if (process.platform !== 'win32') {
-    const hooks = ['pre-commit', 'commit-msg'];
+    const hooks = ['pre-commit', 'commit-msg', 'pre-push'];
     for (const name of hooks) {
       const hookPath = path.join(__dirname, '..', '.githooks', name);
       if (fs.existsSync(hookPath)) {

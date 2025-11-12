@@ -1,0 +1,41 @@
+#!/bin/sh
+
+# pre-push: Evita dos pushes consecutius
+# - Bloqueja pushes redundants (sense canvis)
+# - Força rebase si l'origin va per davant per evitar merges automàtics
+
+set -e
+
+# Si no hi ha upstream configurat, no bloquejar (primer push)
+upstream="$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || true)"
+[ -z "$upstream" ] && exit 0
+
+local="$(git rev-parse @)"
+remote="$(git rev-parse "$upstream" 2>/dev/null || true)"
+base="$(git merge-base @ "$upstream" 2>/dev/null || true)"
+
+# Push redundant: res a empènyer
+if [ "$local" = "$remote" ]; then
+  echo "ℹ️ Res per empènyer (evitant push redundant)."
+  exit 1
+fi
+
+# Si el remote és desconegut (primera empenta a aquest upstream), permet
+[ -z "$remote" ] && exit 0
+
+# L'origin va per davant: obliguem a rebase
+if [ "$base" = "$local" ]; then
+  echo "⚠️ La branca remota té commits nous."
+  echo "   Executa: git pull --rebase --autostash"
+  exit 1
+fi
+
+# Històries divergents: millor rebase manual
+if [ "$base" != "$remote" ]; then
+  echo "⚠️ Històries divergents. Fes rebase abans del push."
+  echo "   git pull --rebase --autostash"
+  exit 1
+fi
+
+exit 0
+
