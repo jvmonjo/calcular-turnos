@@ -10,6 +10,11 @@ MSG_FILE="$(git rev-parse --git-path COMMIT_EDITMSG)"
 
 MSG_CONTENT="$(cat "$MSG_FILE")"
 
+# Si ja hi ha package.json o js/version.js staged, no tornar a fer bump
+if git diff --cached --name-only | grep -qE '^(package.json|js/version.js)$'; then
+  exit 0
+fi
+
 # Ometre merges o reverts
 case "$MSG_CONTENT" in
   Merge\ *|Revert\ *)
@@ -38,4 +43,3 @@ node scripts/bump-version.js "$TYPE"
 git add package.json js/version.js
 
 exit 0
-

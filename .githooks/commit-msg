@@ -1,50 +1,5 @@
 #!/bin/sh
 
-# Hook commit-msg: decideix el tipus de bump (major/minor/patch)
-# i afegeix els fitxers de versió al mateix commit (sense amend)
-# per evitar errors de HEAD durant el commit des d'IDE.
-
-MSG_FILE="$1"
-
-# Si no hi ha fitxer de missatge, res a fer
-if [ -z "$MSG_FILE" ] || [ ! -f "$MSG_FILE" ]; then
-  exit 0
-fi
-
-MSG_CONTENT="$(cat "$MSG_FILE")"
-
-# Ometre merges o reverts
-case "$MSG_CONTENT" in
-  Merge\ *|Revert\ *)
-    exit 0
-    ;;
-esac
-
-TYPE="patch"
-
-# Major si hi ha BREAKING CHANGE(S) o tipus amb ! (p.ex. feat!:)
-echo "$MSG_CONTENT" | grep -qiE 'BREAKING CHANGE|BREAKING CHANGES' && TYPE="major"
-if [ "$TYPE" != "major" ]; then
-  echo "$MSG_CONTENT" | head -n1 | grep -qiE '^[a-z]+(\([^)]+\))?!:' && TYPE="major"
-fi
-
-# Minor si comença per feat
-if [ "$TYPE" != "major" ]; then
-  echo "$MSG_CONTENT" | head -n1 | grep -qiE '^feat(\([^)]+\))?:' && TYPE="minor"
-fi
-
-echo "Decidint increment de versió segons el missatge: $TYPE"
-
-# Executar el bump
-node scripts/bump-version.js "$TYPE"
-STATUS=$?
-if [ $STATUS -ne 0 ]; then
-  echo "Error durant el bump de versió"
-  exit 1
-fi
-
-# Afegir els canvis al mateix commit (sense amend)
-git add package.json js/version.js || exit 1
-
+# commit-msg: sense acció (el bump es fa a pre-commit)
 exit 0
 
