@@ -66,6 +66,9 @@ function exportarPDF(fechaInicio, turnoInicio) {
     doc.text(`${i + 1}`, x + anchoCelda / 2, margenSup - 2, { align: 'center' });
   }
 
+  // Opció de patró per caps de setmana: 'rayas' o 'puntos'
+  const patronFondoCapDeSetmana = 'rayas';
+
   // Dibujar cada mes
   doc.setFontSize(9);
   let yPos = margenSup;
@@ -88,22 +91,20 @@ function exportarPDF(fechaInicio, turnoInicio) {
 
           if (turnoData) {
             // Color de fondo según el turno
-            let color = colores[turnoData.turno];
+            const color = colores[turnoData.turno];
 
-            // Enfosquir les cel·les dels caps de setmana
+            // Detectar cap de setmana (DG=0, DS=6)
             const esCapDeSetmana = turnoData.diaSemana === 0 || turnoData.diaSemana === 6;
-            if (esCapDeSetmana) {
-              // Enfosquir el color restant un 15% a cada component RGB
-              color = [
-                Math.max(0, color[0] - 40),
-                Math.max(0, color[1] - 40),
-                Math.max(0, color[2] - 40)
-              ];
-            }
 
+            // Fons de la cel·la
             doc.setFillColor(color[0], color[1], color[2]);
             doc.setDrawColor(200, 200, 200);
             doc.rect(x, yPos, anchoCelda, altoCelda, 'FD');
+
+            // Patró per a caps de setmana sobreposat al fons
+            if (esCapDeSetmana) {
+              aplicarPatronFondo(doc, x, yPos, anchoCelda, altoCelda, patronFondoCapDeSetmana);
+            }
 
             // Texto del turno
             doc.setFont(undefined, 'bold');
@@ -210,4 +211,57 @@ function obtenerColorTexto(colorFondo) {
     return [60, 60, 60]; // Texto oscuro
   }
   return [255, 255, 255]; // Texto claro
+}
+
+/**
+ * Dibuixa un patró de fons dins d'un rectangle (caps de setmana)
+ * tipus: 'rayas' | 'puntos'
+ */
+function aplicarPatronFondo(doc, x, y, w, h, tipus = 'rayas') {
+  // Color suau per al patró perquè funcioni sobre colors clars (més difuminat)
+  const colorPatron = [160, 160, 160];
+
+  if (tipus === 'puntos') {
+    // Graella de punts
+    doc.setFillColor(colorPatron[0], colorPatron[1], colorPatron[2]);
+    const pasX = 2.5;
+    const pasY = 2.5;
+    const radi = 0.3;
+    for (let yy = y + pasY / 2; yy < y + h; yy += pasY) {
+      for (let xx = x + pasX / 2; xx < x + w; xx += pasX) {
+        doc.circle(xx, yy, radi, 'F');
+      }
+    }
+  } else {
+    // Ratlles obliqües (45º) i més difuminades
+    doc.setDrawColor(colorPatron[0], colorPatron[1], colorPatron[2]);
+    if (typeof doc.setLineCap === 'function') {
+      doc.setLineCap('round'); // extrems arrodonits per aparença més suau
+    }
+    doc.setLineWidth(0.12); // una mica més fi que abans
+
+    const pas = 2.2; // separació entre segments (mm)
+    const mig = 1.5; // meitat de la longitud del segment (~3mm total, diagonal suau)
+
+    // Dibuixa petits segments diagonals dins la cel·la, en una graella
+    for (let yy = y + pas / 2; yy < y + h; yy += pas) {
+      for (let xx = x + pas / 2; xx < x + w; xx += pas) {
+        let x1 = xx - mig;
+        let y1 = yy - mig;
+        let x2 = xx + mig;
+        let y2 = yy + mig;
+
+        // Limitar els extrems a l'interior del rectangle (pinça suau)
+        x1 = Math.max(x, Math.min(x + w, x1));
+        y1 = Math.max(y, Math.min(y + h, y1));
+        x2 = Math.max(x, Math.min(x + w, x2));
+        y2 = Math.max(y, Math.min(y + h, y2));
+
+        // Evitar dibuixar segments degenerats
+        if (x1 !== x2 || y1 !== y2) {
+          doc.line(x1, y1, x2, y2);
+        }
+      }
+    }
+  }
 }

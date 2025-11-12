@@ -4,5 +4,5 @@
  * entre el Service Worker, el PDF i el sistema d'actualitzacions
  */
 
-const APP_VERSION = '1.1.0';
-const CACHE_VERSION = 'v1-1-0';
+const APP_VERSION = '1.2.0';
+const CACHE_VERSION = 'v1-2-0';
