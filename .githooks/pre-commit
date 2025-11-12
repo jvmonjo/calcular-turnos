@@ -1,12 +1,41 @@
 #!/bin/sh
 
-# Pre-commit: el bump de versió es decidirà segons el missatge
-# al hook commit-msg i s'inclourà mitjançant un amend del commit.
+# Pre-commit: decideix el bump a partir del missatge i
+# inclou els fitxers de versió en el mateix commit.
 
-YELLOW='\033[1;33m'
-NC='\033[0m'
+set -e
 
-echo "${YELLOW}ℹ️ La versió es gestionarà al commit-msg segons el missatge.${NC}"
+MSG_FILE="$(git rev-parse --git-path COMMIT_EDITMSG)"
+[ -f "$MSG_FILE" ] || exit 0
+
+MSG_CONTENT="$(cat "$MSG_FILE")"
+
+# Ometre merges o reverts
+case "$MSG_CONTENT" in
+  Merge\ *|Revert\ *)
+    exit 0
+    ;;
+esac
+
+TYPE="patch"
+
+# Major: BREAKING CHANGE(S) o tipus amb ! (p.ex. feat!:)
+echo "$MSG_CONTENT" | grep -qiE 'BREAKING CHANGE|BREAKING CHANGES' && TYPE="major"
+if [ "$TYPE" != "major" ]; then
+  echo "$MSG_CONTENT" | head -n1 | grep -qiE '^[a-z]+(\([^)]+\))?!:' && TYPE="major"
+fi
+
+# Minor: comença per feat
+if [ "$TYPE" != "major" ]; then
+  echo "$MSG_CONTENT" | head -n1 | grep -qiE '^feat(\([^)]+\))?:' && TYPE="minor"
+fi
+
+echo "Decidint increment de versió segons el missatge: $TYPE"
+
+node scripts/bump-version.js "$TYPE"
+
+# Incloure els fitxers de versió al mateix commit
+git add package.json js/version.js
 
 exit 0
 
