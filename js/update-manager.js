@@ -91,12 +91,12 @@ function mostrarNotificacioActualitzacio(forceReload = false) {
     <div class="update-content">
       <span class="update-icon">🔄</span>
       <div class="update-text">
-        <strong>Nova versió disponible!</strong>
-        <p>Fes clic a "Actualitzar" per obtenir les últimes millores.</p>
+        <strong>Nueva versión disponible!</strong>
+        <p>Haz clic en "Actualizar" para obtener las últimas mejoras.</p>
       </div>
       <div class="update-buttons">
-        <button id="update-reload" class="update-btn primary">Actualitzar</button>
-        <button id="update-dismiss" class="update-btn secondary">Més tard</button>
+        <button id="update-reload" class="update-btn primary">Actualizar</button>
+        <button id="update-dismiss" class="update-btn secondary">Más tarde</button>
       </div>
     </div>
   `;
