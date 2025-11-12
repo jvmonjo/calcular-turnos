@@ -1,18 +1,13 @@
 #!/bin/sh
 
 # Hook commit-msg: decideix el tipus de bump (major/minor/patch)
-# segons el missatge de commit i amenda el commit per incloure
-# els canvis de versió (package.json i js/version.js).
+# i afegeix els fitxers de versió al mateix commit (sense amend)
+# per evitar errors de HEAD durant el commit des d'IDE.
 
 MSG_FILE="$1"
 
 # Si no hi ha fitxer de missatge, res a fer
 if [ -z "$MSG_FILE" ] || [ ! -f "$MSG_FILE" ]; then
-  exit 0
-fi
-
-# Evitar recursió quan fem --amend
-if [ "$GIT_AMEND_VERSION_BUMPED" = "1" ]; then
   exit 0
 fi
 
@@ -27,7 +22,7 @@ esac
 
 TYPE="patch"
 
-# Major si té BREAKING CHANGE(S) o tipus amb ! (p.ex. feat!:)
+# Major si hi ha BREAKING CHANGE(S) o tipus amb ! (p.ex. feat!:)
 echo "$MSG_CONTENT" | grep -qiE 'BREAKING CHANGE|BREAKING CHANGES' && TYPE="major"
 if [ "$TYPE" != "major" ]; then
   echo "$MSG_CONTENT" | head -n1 | grep -qiE '^[a-z]+(\([^)]+\))?!:' && TYPE="major"
@@ -48,10 +43,8 @@ if [ $STATUS -ne 0 ]; then
   exit 1
 fi
 
-# Afegir els canvis i amendar el commit
-git add package.json js/version.js
-
-GIT_AMEND_VERSION_BUMPED=1 git commit --amend --no-edit || exit 1
+# Afegir els canvis al mateix commit (sense amend)
+git add package.json js/version.js || exit 1
 
 exit 0
 
