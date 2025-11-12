@@ -109,3 +109,5 @@ Per desplegar una nova versió:
 - No interrompen l'ús de l'aplicació
 - L'usuari sempre té control sobre quan aplicar-les
 - Si l'usuari tanca el banner, pot actualitzar manualment recarregant la pàgina
+
+- Test hooks: verificaci� del flux d'un sol push
