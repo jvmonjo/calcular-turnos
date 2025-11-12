@@ -41,8 +41,8 @@ function exportarPDF(fechaInicio, turnoInicio) {
   // Título principal
   doc.setFontSize(22);
   doc.setFont(undefined, 'bold');
-  doc.setTextColor(102, 126, 234);
-  doc.text(`Calendari de Torns ${year}`, doc.internal.pageSize.getWidth() / 2, 15, { align: 'center' });
+  doc.setTextColor(80, 80, 80);
+  doc.text(`Calendario de Turnos ${year}`, doc.internal.pageSize.getWidth() / 2, 15, { align: 'center' });
 
   // Configuración de la cuadrícula
   const margenIzq = 15;
@@ -164,10 +164,10 @@ function exportarPDF(fechaInicio, turnoInicio) {
 
   doc.setFontSize(8);
   doc.setTextColor(150, 150, 150);
-  doc.text(`Generat: ${new Date().toLocaleDateString('ca-ES')}`, pageWidth / 2, pageHeight - 5, { align: 'center' });
+  doc.text(`Generado: ${new Date().toLocaleDateString('ca-ES')}`, pageWidth / 2, pageHeight - 5, { align: 'center' });
 
   // Descargar PDF
-  doc.save(`Calendari_Torns_${year}.pdf`);
+  doc.save(`Calendario_Turnos_${year}.pdf`);
 }
 
 /**

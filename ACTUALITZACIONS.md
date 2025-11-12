@@ -65,7 +65,7 @@ Per desplegar una nova versió:
 1. Modifica els fitxers necessaris
 2. **Canvia `CACHE_NAME` a `sw.js`**:
    ```javascript
-   const CACHE_NAME = 'calculadora-torns-v6'; // Incrementa el número
+   const CACHE_NAME = 'calculadora-torns-v7'; // Incrementa el número
    ```
 3. Desplega els canvis
 4. Els usuaris rebran automàticament la notificació
