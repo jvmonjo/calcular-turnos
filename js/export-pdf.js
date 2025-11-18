@@ -21,8 +21,8 @@ function exportarPDF(fechaInicio, turnoInicio) {
   const colores = generarColoresTurnos(config.nombresTurnos);
 
   // Nombres de meses
-  const nombresMeses = ['Gener', 'Febrer', 'Març', 'Abril', 'Maig', 'Juny',
-                        'Juliol', 'Agost', 'Setembre', 'Octubre', 'Novembre', 'Desembre'];
+  const nombresMeses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
   // Agrupar turnos por mes
   const turnosPorMes = {};
@@ -75,6 +75,7 @@ function exportarPDF(fechaInicio, turnoInicio) {
 
   for (let mes = 0; mes < 12; mes++) {
     // Nombre del mes
+    doc.setFontSize(9);
     doc.setFont(undefined, 'bold');
     doc.setTextColor(60, 60, 60);
     doc.text(nombresMeses[mes], margenIzq, yPos + altoCelda / 2 + 1.5);
@@ -90,35 +91,36 @@ function exportarPDF(fechaInicio, turnoInicio) {
           const turnoData = turnosPorMes[mes].find(t => t.dia === dia);
 
           if (turnoData) {
-            // Color de fondo según el turno
-            const color = colores[turnoData.turno];
-
-            // Detectar cap de setmana (DG=0, DS=6)
+            const color = colores[turnoData.turno] || [255, 255, 255];
             const esCapDeSetmana = turnoData.diaSemana === 0 || turnoData.diaSemana === 6;
+            const esLliure = turnoData.turno === 'L';
 
-            // Fons de la cel·la
-            doc.setFillColor(color[0], color[1], color[2]);
-            doc.setDrawColor(200, 200, 200);
-            doc.rect(x, yPos, anchoCelda, altoCelda, 'FD');
+            if (esLliure) {
+              // Cel�les lliures sense fons per reduir c�rrega visual
+              doc.setDrawColor(220, 220, 220);
+              doc.rect(x, yPos, anchoCelda, altoCelda, 'S');
 
-            // Patró per a caps de setmana sobreposat al fons
-            if (esCapDeSetmana) {
-              aplicarPatronFondo(doc, x, yPos, anchoCelda, altoCelda, patronFondoCapDeSetmana);
-            }
-
-            // Texto del turno
-            doc.setFont(undefined, 'bold');
-            doc.setFontSize(7);
-
-            if (turnoData.turno === 'A') {
-              doc.setTextColor(204, 102, 0);
-            } else if (turnoData.turno === 'V') {
-              doc.setTextColor(153, 51, 0);
+              if (esCapDeSetmana) {
+                aplicarPatronFondo(doc, x, yPos, anchoCelda, altoCelda, patronFondoCapDeSetmana);
+              }
             } else {
-              doc.setTextColor(150, 150, 150);
-            }
+              // Fons de la cel�la segons el torn
+              doc.setFillColor(color[0], color[1], color[2]);
+              doc.setDrawColor(200, 200, 200);
+              doc.rect(x, yPos, anchoCelda, altoCelda, 'FD');
 
-            doc.text(turnoData.turno, x + anchoCelda / 2, yPos + altoCelda / 2 + 1.5, { align: 'center' });
+              // Patr� per a caps de setmana sobreposat al fons
+              if (esCapDeSetmana) {
+                aplicarPatronFondo(doc, x, yPos, anchoCelda, altoCelda, patronFondoCapDeSetmana);
+              }
+
+              // Texto del turno
+              doc.setFont(undefined, 'bold');
+              doc.setFontSize(7);
+              const colorTextoTurno = obtenerColorTextoTurno(turnoData.turno);
+              doc.setTextColor(colorTextoTurno[0], colorTextoTurno[1], colorTextoTurno[2]);
+              doc.text(turnoData.turno, x + anchoCelda / 2, yPos + altoCelda / 2 + 1.5, { align: 'center' });
+            }
           }
         } else {
           // Celda vacía para días que no existen en el mes
@@ -133,27 +135,35 @@ function exportarPDF(fechaInicio, turnoInicio) {
   }
 
   // Leyenda
-  const yLeyenda = yPos + 5;
+  const separacionLeyenda = 12; // espai addicional per separar de la graella
+  const yLeyenda = yPos + separacionLeyenda;
   doc.setFontSize(9);
   doc.setFont(undefined, 'bold');
   doc.setTextColor(60, 60, 60);
-  doc.text('Llegenda:', margenIzq, yLeyenda);
+  doc.text('Leyenda:', margenIzq, yLeyenda);
 
   // Dibujar leyenda dinámicamente según los turnos configurados
   let xLeyenda = margenIzq + 25;
   config.nombresTurnos.forEach((turno, index) => {
     const color = colores[turno];
-    const colorTexto = obtenerColorTexto(color);
+    const esLliure = turno === 'L';
 
-    doc.setFillColor(color[0], color[1], color[2]);
     doc.setDrawColor(200, 200, 200);
-    doc.rect(xLeyenda, yLeyenda - 3, 8, 5, 'FD');
-    doc.setTextColor(colorTexto[0], colorTexto[1], colorTexto[2]);
+    if (esLliure) {
+      doc.setFillColor(255, 255, 255);
+      doc.rect(xLeyenda, yLeyenda - 3, 8, 5, 'S');
+      doc.setTextColor(130, 130, 130);
+    } else {
+      doc.setFillColor(color[0], color[1], color[2]);
+      doc.rect(xLeyenda, yLeyenda - 3, 8, 5, 'FD');
+    }
+    const colorTextoTurno = esLliure ? [130, 130, 130] : obtenerColorTextoTurno(turno);
     doc.setFont(undefined, 'bold');
+    doc.setTextColor(colorTextoTurno[0], colorTextoTurno[1], colorTextoTurno[2]);
     doc.text(turno, xLeyenda + 4, yLeyenda + 1, { align: 'center' });
     doc.setTextColor(60, 60, 60);
     doc.setFont(undefined, 'normal');
-    doc.text(`Torn ${turno}`, xLeyenda + 10, yLeyenda);
+    doc.text(`Turno ${turno}`, xLeyenda + 10, yLeyenda);
 
     xLeyenda += 30;
   });
@@ -214,11 +224,24 @@ function obtenerColorTexto(colorFondo) {
 }
 
 /**
+ * Retorna el color de text emprat per a cada codi de torn
+ */
+function obtenerColorTextoTurno(turno) {
+  if (turno === 'A') {
+    return [204, 102, 0];
+  }
+  if (turno === 'V') {
+    return [153, 51, 0];
+  }
+  return [150, 150, 150];
+}
+
+/**
  * Dibuixa un patró de fons dins d'un rectangle (caps de setmana)
  * tipus: 'rayas' | 'puntos'
  */
 function aplicarPatronFondo(doc, x, y, w, h, tipus = 'rayas') {
-  // Color suau per al patró perquè funcioni sobre colors clars (més difuminat)
+  // Color suau per al patro perque funcioni sobre colors clars (mes difuminat)
   const colorPatron = [160, 160, 160];
 
   if (tipus === 'puntos') {
@@ -233,34 +256,40 @@ function aplicarPatronFondo(doc, x, y, w, h, tipus = 'rayas') {
       }
     }
   } else {
-    // Ratlles obliqües (45º) i més difuminades
+    // Ratlles obliques (45 graus) amb angle constant a tota la cella
     doc.setDrawColor(colorPatron[0], colorPatron[1], colorPatron[2]);
     if (typeof doc.setLineCap === 'function') {
-      doc.setLineCap('round'); // extrems arrodonits per aparença més suau
+      doc.setLineCap('round');
     }
-    doc.setLineWidth(0.12); // una mica més fi que abans
+    doc.setLineWidth(0.12);
 
-    const pas = 2.2; // separació entre segments (mm)
-    const mig = 1.5; // meitat de la longitud del segment (~3mm total, diagonal suau)
+    const pas = 2.4; // separacio regular entre ratlles (mm)
+    // Construir totes les rectes de 45 graus garantint el mateix angle a tota la cella
+    for (let offset = -h; offset <= w; offset += pas) {
+      const punts = [];
 
-    // Dibuixa petits segments diagonals dins la cel·la, en una graella
-    for (let yy = y + pas / 2; yy < y + h; yy += pas) {
-      for (let xx = x + pas / 2; xx < x + w; xx += pas) {
-        let x1 = xx - mig;
-        let y1 = yy - mig;
-        let x2 = xx + mig;
-        let y2 = yy + mig;
+      const yEsquerra = -offset;
+      if (yEsquerra >= 0 && yEsquerra <= h) punts.push({ x: 0, y: yEsquerra });
 
-        // Limitar els extrems a l'interior del rectangle (pinça suau)
-        x1 = Math.max(x, Math.min(x + w, x1));
-        y1 = Math.max(y, Math.min(y + h, y1));
-        x2 = Math.max(x, Math.min(x + w, x2));
-        y2 = Math.max(y, Math.min(y + h, y2));
+      const yDreta = w - offset;
+      if (yDreta >= 0 && yDreta <= h) punts.push({ x: w, y: yDreta });
 
-        // Evitar dibuixar segments degenerats
-        if (x1 !== x2 || y1 !== y2) {
-          doc.line(x1, y1, x2, y2);
+      const xSuperior = offset;
+      if (xSuperior >= 0 && xSuperior <= w) punts.push({ x: xSuperior, y: 0 });
+
+      const xInferior = h + offset;
+      if (xInferior >= 0 && xInferior <= w) punts.push({ x: xInferior, y: h });
+
+      const puntsUnics = [];
+      for (const punt of punts) {
+        if (!puntsUnics.some(p => Math.abs(p.x - punt.x) < 0.01 && Math.abs(p.y - punt.y) < 0.01)) {
+          puntsUnics.push(punt);
         }
+      }
+
+      if (puntsUnics.length >= 2) {
+        const [p1, p2] = puntsUnics;
+        doc.line(x + p1.x, y + p1.y, x + p2.x, y + p2.y);
       }
     }
   }
