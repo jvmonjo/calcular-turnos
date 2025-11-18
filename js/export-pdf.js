@@ -1,6 +1,6 @@
-/**
- * Mòdul d'exportació PDF
- * Gestiona l'exportació dels torns a format PDF amb disseny elegant
+﻿/**
+ * MÃ²dul d'exportaciÃ³ PDF
+ * Gestiona l'exportaciÃ³ dels torns a format PDF amb disseny elegant
  */
 
 /**
@@ -17,7 +17,7 @@ function exportarPDF(fechaInicio, turnoInicio) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('landscape', 'mm', 'a4');
 
-  // Generar colores dinámicamente para cada turno
+  // Generar colores dinÃ¡micamente para cada turno
   const colores = generarColoresTurnos(config.nombresTurnos);
 
   // Nombres de meses
@@ -38,13 +38,13 @@ function exportarPDF(fechaInicio, turnoInicio) {
     });
   });
 
-  // Título principal
+  // TÃ­tulo principal
   doc.setFontSize(22);
   doc.setFont(undefined, 'bold');
   doc.setTextColor(80, 80, 80);
   doc.text(`Calendario de Turnos ${year}`, doc.internal.pageSize.getWidth() / 2, 15, { align: 'center' });
 
-  // Configuración de la cuadrícula
+  // ConfiguraciÃ³n de la cuadrÃ­cula
   const margenIzq = 15;
   const margenDer = 15;
   const margenSup = 25;
@@ -54,7 +54,7 @@ function exportarPDF(fechaInicio, turnoInicio) {
   const altoCelda = 6;
   const espacioEntreMeses = 2;
 
-  // Dibujar encabezado de días de la semana
+  // Dibujar encabezado de dÃ­as de la semana
   const diasSemana = ['DL', 'DM', 'DC', 'DJ', 'DV', 'DS', 'DG'];
   doc.setFontSize(7);
   doc.setFont(undefined, 'bold');
@@ -66,7 +66,7 @@ function exportarPDF(fechaInicio, turnoInicio) {
     doc.text(`${i + 1}`, x + anchoCelda / 2, margenSup - 2, { align: 'center' });
   }
 
-  // Opció de patró per caps de setmana: 'rayas' o 'puntos'
+  // OpciÃ³ de patrÃ³ per caps de setmana: 'rayas' o 'puntos'
   const patronFondoCapDeSetmana = 'rayas';
 
   // Dibujar cada mes
@@ -80,7 +80,7 @@ function exportarPDF(fechaInicio, turnoInicio) {
     doc.setTextColor(60, 60, 60);
     doc.text(nombresMeses[mes], margenIzq, yPos + altoCelda / 2 + 1.5);
 
-    // Dibujar celdas de días
+    // Dibujar celdas de dÃ­as
     if (turnosPorMes[mes]) {
       const diasEnMes = new Date(year, mes + 1, 0).getDate();
 
@@ -96,7 +96,7 @@ function exportarPDF(fechaInicio, turnoInicio) {
             const esLliure = turnoData.turno === 'L';
 
             if (esLliure) {
-              // Cel�les lliures sense fons per reduir c�rrega visual
+              // Celï¿½les lliures sense fons per reduir cï¿½rrega visual
               doc.setDrawColor(220, 220, 220);
               doc.rect(x, yPos, anchoCelda, altoCelda, 'S');
 
@@ -104,12 +104,12 @@ function exportarPDF(fechaInicio, turnoInicio) {
                 aplicarPatronFondo(doc, x, yPos, anchoCelda, altoCelda, patronFondoCapDeSetmana);
               }
             } else {
-              // Fons de la cel�la segons el torn
+              // Fons de la celï¿½la segons el torn
               doc.setFillColor(color[0], color[1], color[2]);
               doc.setDrawColor(200, 200, 200);
               doc.rect(x, yPos, anchoCelda, altoCelda, 'FD');
 
-              // Patr� per a caps de setmana sobreposat al fons
+              // Patrï¿½ per a caps de setmana sobreposat al fons
               if (esCapDeSetmana) {
                 aplicarPatronFondo(doc, x, yPos, anchoCelda, altoCelda, patronFondoCapDeSetmana);
               }
@@ -123,7 +123,7 @@ function exportarPDF(fechaInicio, turnoInicio) {
             }
           }
         } else {
-          // Celda vacía para días que no existen en el mes
+          // Celda vacÃ­a para dÃ­as que no existen en el mes
           doc.setFillColor(245, 245, 245);
           doc.setDrawColor(230, 230, 230);
           doc.rect(x, yPos, anchoCelda, altoCelda, 'FD');
@@ -142,7 +142,7 @@ function exportarPDF(fechaInicio, turnoInicio) {
   doc.setTextColor(60, 60, 60);
   doc.text('Leyenda:', margenIzq, yLeyenda);
 
-  // Dibujar leyenda dinámicamente según los turnos configurados
+  // Dibujar leyenda dinÃ¡micamente segÃºn los turnos configurados
   let xLeyenda = margenIzq + 25;
   config.nombresTurnos.forEach((turno, index) => {
     const color = colores[turno];
@@ -168,7 +168,16 @@ function exportarPDF(fechaInicio, turnoInicio) {
     xLeyenda += 30;
   });
 
-  // Peu de pàgina amb data de generació
+  // Indicador de caps de setmana amb ratlles
+  doc.setDrawColor(200, 200, 200);
+  doc.setFillColor(255, 255, 255);
+  doc.rect(xLeyenda, yLeyenda - 3, 8, 5, 'S');
+  aplicarPatronFondo(doc, xLeyenda, yLeyenda - 3, 8, 5, patronFondoCapDeSetmana);
+  doc.setFont(undefined, 'normal');
+  doc.setTextColor(60, 60, 60);
+  doc.text('Fin de semana', xLeyenda + 12, yLeyenda);
+
+  // Peu de pÃ gina amb data de generaciÃ³
   const pageHeight = doc.internal.pageSize.getHeight();
   const pageWidth = doc.internal.pageSize.getWidth();
 
@@ -181,7 +190,7 @@ function exportarPDF(fechaInicio, turnoInicio) {
 }
 
 /**
- * Genera colores automáticamente para cada turno
+ * Genera colores automÃ¡ticamente para cada turno
  */
 function generarColoresTurnos(nombresTurnos) {
   const coloresPredefinidos = {
@@ -212,7 +221,7 @@ function generarColoresTurnos(nombresTurnos) {
 }
 
 /**
- * Obtiene el color de texto apropiado según el color de fondo
+ * Obtiene el color de texto apropiado segÃºn el color de fondo
  */
 function obtenerColorTexto(colorFondo) {
   // Si el color es muy claro, usar texto oscuro
@@ -237,7 +246,7 @@ function obtenerColorTextoTurno(turno) {
 }
 
 /**
- * Dibuixa un patró de fons dins d'un rectangle (caps de setmana)
+ * Dibuixa un patrÃ³ de fons dins d'un rectangle (caps de setmana)
  * tipus: 'rayas' | 'puntos'
  */
 function aplicarPatronFondo(doc, x, y, w, h, tipus = 'rayas') {
@@ -294,3 +303,4 @@ function aplicarPatronFondo(doc, x, y, w, h, tipus = 'rayas') {
     }
   }
 }
+
