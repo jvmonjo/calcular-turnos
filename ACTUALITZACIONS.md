@@ -65,7 +65,7 @@ Per desplegar una nova versió:
 1. Modifica els fitxers necessaris
 2. **Canvia `CACHE_NAME` a `sw.js`**:
    ```javascript
-   const CACHE_NAME = 'calculadora-torns-v7'; // Incrementa el número
+   const CACHE_NAME = 'calculadora-turnos-v7'; // Incrementa el número
    ```
 3. Desplega els canvis
 4. Els usuaris rebran automàticament la notificació
@@ -110,4 +110,4 @@ Per desplegar una nova versió:
 - L'usuari sempre té control sobre quan aplicar-les
 - Si l'usuari tanca el banner, pot actualitzar manualment recarregant la pàgina
 
-- Test hooks: verificaci� del flux d'un sol push
+- Test hooks: verificaci� del flux d'un sol push

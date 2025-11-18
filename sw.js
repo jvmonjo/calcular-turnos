@@ -6,7 +6,7 @@
 // Importar versió des de version.js
 importScripts('./js/version.js');
 
-const CACHE_NAME = `calculadora-torns-${CACHE_VERSION}`;
+const CACHE_NAME = `calculadora-turnos-${CACHE_VERSION}`;
 const urlsToCache = [
   './',
   './index.html',
