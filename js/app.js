@@ -1,13 +1,13 @@
 /**
- * Fitxer principal de l'aplicació
- * Gestiona la inicialització i els event listeners
+ * Main application file
+ * Handles initialization and event listeners
  */
 
-// Manejar el envío del formulario
+// Handle form submission
 document.getElementById('turnoForm').addEventListener('submit', function(event) {
   event.preventDefault();
 
-  // Leer las fechas y crear objetos Date en hora local
+  // Read dates and create Date objects in local time
   const inicioValue = document.getElementById('inicio').value;
   const fechaInicio = new Date(inicioValue + 'T00:00:00');
   const turnoInicio = document.getElementById('turnoInicio').value;
@@ -27,7 +27,7 @@ document.getElementById('turnoForm').addEventListener('submit', function(event) 
   }
 });
 
-// Exportar turnos a CSV
+// Export shifts to CSV
 document.getElementById('exportarCSV').addEventListener('click', function() {
   const inicioValue = document.getElementById('inicio').value;
   const fechaInicio = new Date(inicioValue + 'T00:00:00');
@@ -41,7 +41,7 @@ document.getElementById('exportarCSV').addEventListener('click', function() {
   exportarCSV(fechaInicio, turnoInicio);
 });
 
-// Exportar turnos a PDF
+// Export shifts to PDF
 document.getElementById('exportarPDF').addEventListener('click', function() {
   const inicioValue = document.getElementById('inicio').value;
   const fechaInicio = new Date(inicioValue + 'T00:00:00');
@@ -55,7 +55,7 @@ document.getElementById('exportarPDF').addEventListener('click', function() {
   exportarPDF(fechaInicio, turnoInicio);
 });
 
-// Exportar turnos a ICS
+// Export shifts to ICS
 document.getElementById('exportarICS').addEventListener('click', function() {
   const inicioValue = document.getElementById('inicio').value;
   const fechaInicio = new Date(inicioValue + 'T00:00:00');
@@ -69,7 +69,7 @@ document.getElementById('exportarICS').addEventListener('click', function() {
   exportarICS(fechaInicio, turnoInicio);
 });
 
-// Mostrar versió al footer
+// Display version in footer
 document.addEventListener('DOMContentLoaded', function() {
   const versionElement = document.getElementById('app-version');
   if (versionElement) {
@@ -77,5 +77,5 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// NOTA: El registre del Service Worker ara es gestiona a update-manager.js
-// per poder detectar actualitzacions i notificar l'usuari
+// NOTE: Service Worker registration now lives in update-manager.js
+// to detect new versions and notify the user

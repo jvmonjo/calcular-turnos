@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# Pre-commit: decideix el bump a partir del missatge i
-# inclou els fitxers de versió en el mateix commit.
+# pre-commit: determines the version bump from the commit message
+# and stages the versioned files in the same commit.
 
 set -e
 
@@ -10,12 +10,12 @@ MSG_FILE="$(git rev-parse --git-path COMMIT_EDITMSG)"
 
 MSG_CONTENT="$(cat "$MSG_FILE")"
 
-# Si ja hi ha package.json o js/version.js staged, no tornar a fer bump
+# If package.json or js/version.js are already staged, skip the bump
 if git diff --cached --name-only | grep -qE '^(package.json|js/version.js)$'; then
   exit 0
 fi
 
-# Ometre merges o reverts
+# Skip merges or reverts
 case "$MSG_CONTENT" in
   Merge\ *|Revert\ *)
     exit 0
@@ -24,22 +24,22 @@ esac
 
 TYPE="patch"
 
-# Major: BREAKING CHANGE(S) o tipus amb ! (p.ex. feat!:)
+# Major: BREAKING CHANGE(S) or scope!
 echo "$MSG_CONTENT" | grep -qiE 'BREAKING CHANGE|BREAKING CHANGES' && TYPE="major"
 if [ "$TYPE" != "major" ]; then
   echo "$MSG_CONTENT" | head -n1 | grep -qiE '^[a-z]+(\([^)]+\))?!:' && TYPE="major"
 fi
 
-# Minor: comença per feat
+# Minor: feat
 if [ "$TYPE" != "major" ]; then
   echo "$MSG_CONTENT" | head -n1 | grep -qiE '^feat(\([^)]+\))?:' && TYPE="minor"
 fi
 
-echo "Decidint increment de versió segons el missatge: $TYPE"
+echo "Determinando incremento de versión según el mensaje: $TYPE"
 
 node scripts/bump-version.js "$TYPE"
 
-# Incloure els fitxers de versió al mateix commit
+# Stage version files in the same commit
 git add package.json js/version.js
 
 exit 0

@@ -1,21 +1,21 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 
 /**
- * Script per configurar els Git hooks
- * Configura Git per utilitzar el directori .githooks
+ * Git hooks setup helper
+ * Configures Git to use the .githooks directory
  */
 
 const { execSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-console.log('Configurant Git hooks...');
+console.log('Configurando Git hooks...');
 
 try {
-  // Configurar Git per utilitzar .githooks com a directori de hooks
+  // Point Git to .githooks
   execSync('git config core.hooksPath .githooks', { stdio: 'inherit' });
 
-  // Fer executables els hooks (només en sistemes Unix)
+  // Make hooks executable on Unix systems
   if (process.platform !== 'win32') {
     const hooks = ['pre-commit', 'commit-msg', 'pre-push'];
     for (const name of hooks) {
@@ -26,18 +26,17 @@ try {
     }
   }
 
-  console.log('✅ Git hooks configurats correctament');
+  console.log('✅ Git hooks configurados correctamente');
   console.log('');
-  console.log("La versió s'ajustarà segons el missatge de commit:");
+  console.log('La versión se ajustará según el mensaje de commit:');
   console.log('  feat -> minor, fix/chore/etc -> patch, BREAKING CHANGE/! -> major');
-  console.log("  (s'inclourà amb amend automàtic)");
+  console.log('  (se aplicará con amend automático)');
   console.log('');
-  console.log('Per incrementar manualment:');
+  console.log('Incrementos manuales:');
   console.log('  npm run version:patch  (1.0.0 -> 1.0.1)');
   console.log('  npm run version:minor  (1.0.0 -> 1.1.0)');
   console.log('  npm run version:major  (1.0.0 -> 2.0.0)');
 } catch (error) {
-  console.error('Error configurant Git hooks:', error.message);
+  console.error('Error configurando Git hooks:', error.message);
   process.exit(1);
 }
-

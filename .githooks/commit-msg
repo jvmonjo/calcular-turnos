@@ -1,5 +1,4 @@
 #!/bin/sh
 
-# commit-msg: sense acció (el bump es fa a pre-commit)
+# commit-msg: no action (the bump happens in pre-commit)
 exit 0
-

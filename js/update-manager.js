@@ -1,97 +1,96 @@
-/**
- * Gestor d'actualitzacions de la PWA
- * Detecta quan hi ha una nova versió disponible i notifica l'usuari
- * Compatible amb Safari/iOS utilitzant localStorage per detectar canvis
+﻿/**
+ * PWA update manager
+ * Detects when a new version is available and shows a banner to the user
+ * Uses localStorage so the logic also works on Safari/iOS
  */
 
 let newWorker = null;
 
 /**
- * Comprova si hi ha una nova versió disponible (mètode Safari/iOS compatible)
+ * Checks if a new version is available using localStorage (Safari/iOS friendly)
  */
 function comprovarVersioLocalStorage() {
   const versioActual = APP_VERSION;
   const versioGuardada = localStorage.getItem('app_version');
 
-  console.log('Versió actual:', versioActual, '| Versió guardada:', versioGuardada);
+  console.log('Versión actual:', versioActual, '| Versión guardada:', versioGuardada);
 
   if (versioGuardada && versioGuardada !== versioActual) {
-    console.log('Nova versió detectada via localStorage');
+    console.log('Nueva versión detectada vía localStorage');
     mostrarNotificacioActualitzacio(true);
   }
 
-  // Guardar la versió actual
+  // Store the current version for the next visit
   localStorage.setItem('app_version', versioActual);
 }
 
 /**
- * Inicialitza el gestor d'actualitzacions
+ * Initializes the update manager
  */
 function initUpdateManager() {
-  // Comprovar versió amb localStorage (funciona a Safari/iOS)
+  // First check using localStorage (works on Safari/iOS)
   comprovarVersioLocalStorage();
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js')
       .then(registration => {
-        console.log('Service Worker registrat:', registration.scope);
+        console.log('Service Worker registrado:', registration.scope);
 
-        // Detectar quan hi ha una actualització esperant
+        // Detect when a new update is waiting
         registration.addEventListener('updatefound', () => {
           newWorker = registration.installing;
-          console.log('Nova versió detectada, instal·lant...');
+          console.log('Nueva versión detectada, instalando...');
 
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              // Hi ha una nova versió disponible
-              console.log('Nova versió instal·lada i esperant');
+              console.log('Nueva versión instalada y esperando');
               mostrarNotificacioActualitzacio(false);
             }
           });
         });
 
-        // Comprovar actualitzacions cada hora
+        // Check for updates every hour
         setInterval(() => {
-          console.log('Comprovant actualitzacions...');
+          console.log('Comprobando actualizaciones...');
           registration.update();
-        }, 60 * 60 * 1000); // 1 hora
+        }, 60 * 60 * 1000);
 
-        // Comprovar actualitzacions quan es recarrega la pàgina
+        // Also check after each reload
         registration.update();
       })
       .catch(error => {
         console.log('Error al registrar el Service Worker:', error);
       });
 
-    // Detectar quan el Service Worker pren control
+    // Reload automatically when the Service Worker takes control
     let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (refreshing) return;
       refreshing = true;
-      console.log('Service Worker actualitzat, recarregant...');
+      console.log('Service Worker actualizado, recargando...');
       window.location.reload();
     });
   }
 }
 
 /**
- * Mostra la notificació d'actualització
- * @param {boolean} forceReload - Si és true, força recàrrega immediata (Safari/iOS)
+ * Shows the update notification banner
+ * @param {boolean} forceReload - Forces a reload (used for Safari/iOS)
  */
 function mostrarNotificacioActualitzacio(forceReload = false) {
-  // Evitar mostrar múltiples banners
+  // Prevent duplicate banners
   if (document.getElementById('update-banner')) {
     return;
   }
 
-  // Crear el banner de notificació
+  // Build banner content
   const banner = document.createElement('div');
   banner.id = 'update-banner';
   banner.innerHTML = `
     <div class="update-content">
-      <span class="update-icon">🔄</span>
+      <span class="update-icon">⚡️</span>
       <div class="update-text">
-        <strong>Nueva versión disponible!</strong>
+        <strong>¡Nueva versión disponible!</strong>
         <p>Haz clic en "Actualizar" para obtener las últimas mejoras.</p>
       </div>
       <div class="update-buttons">
@@ -106,10 +105,10 @@ function mostrarNotificacioActualitzacio(forceReload = false) {
   // Event listeners
   document.getElementById('update-reload').addEventListener('click', () => {
     if (forceReload || !newWorker) {
-      // Recàrrega forçada per Safari/iOS o si no hi ha Service Worker
+      // Force reload for Safari/iOS or when no SW is present yet
       window.location.reload(true);
-    } else if (newWorker) {
-      // Activar nou Service Worker
+    } else {
+      // Activate the waiting Service Worker
       newWorker.postMessage({ type: 'SKIP_WAITING' });
     }
   });
@@ -118,13 +117,13 @@ function mostrarNotificacioActualitzacio(forceReload = false) {
     banner.remove();
   });
 
-  // Animar l'entrada
+  // Animate banner entrance
   setTimeout(() => {
     banner.classList.add('show');
   }, 100);
 }
 
-// Inicialitzar quan carrega el DOM
+// Initialize when the DOM is ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initUpdateManager);
 } else {

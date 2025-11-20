@@ -1,190 +1,153 @@
-# Calculadora de Torns
+# Calculadora de Turnos
 
-Aplicació web progressiva (PWA) per calcular i gestionar torns de treball amb patrons personalitzables.
+Aplicación web progresiva (PWA) para calcular y gestionar turnos de trabajo con patrones totalmente personalizables. Todo el material de referencia (instalación, uso, actualizaciones y versionado) se centraliza en este README para que no tengas que consultar varios archivos.
 
-## 🚀 Característiques
+## Contenido
 
-- ⚙️ **Configuració Personalitzable**:
-  - Defineix la durada del cicle (de 1 a 365 dies)
-  - Crea els teus propis noms de torns (A, V, L, M, T, N, etc.)
-  - Personalitza el patró de torns segons les teves necessitats
-  - Configuració guardada localment al navegador
-- ✅ Càlcul automàtic de torns per a qualsevol data
-- 📅 Exportació a múltiples formats:
-  - **CSV**: Per a fulles de càlcul
-  - **PDF**: Calendari anual visualment elegant amb colors dinàmics
-  - **ICS**: Per a Google Calendar, Apple Calendar, Outlook, etc.
-- 🔄 Suport per a cicles de qualsevol durada (múltiples de 7 i altres)
-- 📱 Progressive Web App (PWA): Instal·lable i funcional sense connexió
-- 🎨 Disseny modern i responsive
-- ⚡ Ràpid i eficient
+1. [Características principales](#características-principales)
+2. [Arquitectura del proyecto](#arquitectura-del-proyecto)
+3. [Instalación y despliegue](#instalación-y-despliegue)
+4. [Uso y configuración](#uso-y-configuración)
+5. [Exportaciones disponibles](#exportaciones-disponibles)
+6. [Sistema de actualizaciones PWA](#sistema-de-actualizaciones-pwa)
+7. [Versionado automático](#versionado-automático)
+8. [Problemas comunes y soporte](#problemas-comunes-y-soporte)
+9. [Tecnologías y compatibilidad](#tecnologías-y-compatibilidad)
+10. [Contribuir](#contribuir)
+11. [Licencia y contacto](#licencia-y-contacto)
 
-## 📁 Estructura del Projecte
+## Características principales
+
+- ⚙️ **Configuración personalizable**: duración del ciclo (1-365 días), nombres de turnos y patrón completo; se guarda en `localStorage`.
+- ✅ **Cálculo inmediato** para cualquier fecha pasada o futura.
+- 📤 **Exportaciones múltiples**: CSV, PDF anual con colores dinámicos e ICS compatible con Google/Apple/Outlook.
+- 🔁 **Soporte para cualquier ciclo** (múltiplos de 7 u otros) con alineado automático cuando aplica.
+- 📱 **PWA completa**: instalable, funciona offline y detecta nuevas versiones con un banner.
+- ⚡ **Rendimiento ligero** gracias a JavaScript puro, sin dependencias pesadas.
+
+## Arquitectura del proyecto
 
 ```
 calcular-turnos/
-├── index.html              # Pàgina principal
-├── manifest.json           # Manifest de la PWA
-├── sw.js                   # Service Worker per a funcionament offline
+├── index.html              # Interfaz principal
+├── manifest.json           # Manifest PWA
+├── sw.js                   # Service Worker para caché y offline
 ├── css/
-│   └── styles.css          # Estils de l'aplicació
+│   └── styles.css          # Estilos globales
 ├── js/
-│   ├── turnos.js           # Lògica de càlcul de torns
-│   ├── config.js           # Gestió de configuració personalitzable
-│   ├── export-csv.js       # Exportació a CSV
-│   ├── export-pdf.js       # Exportació a PDF amb colors dinàmics
-│   ├── export-ics.js       # Exportació a ICS (iCalendar)
-│   └── app.js              # Inicialització i event listeners
-├── icons/
-│   ├── icon.svg            # Icona vectorial
-│   ├── generate-icons.html # Generador d'icones PNG
-│   └── README.md           # Instruccions per generar icones
-└── README.md               # Aquest fitxer
+│   ├── app.js              # Eventos de UI
+│   ├── turnos.js           # Lógica de cálculo
+│   ├── config.js           # Panel de personalización
+│   ├── export-*.js         # Exportaciones CSV/PDF/ICS
+│   ├── update-manager.js   # Detección de nuevas versiones
+│   └── version.js          # Constantes APP_VERSION/CACHE_VERSION
+├── icons/                  # Iconos PWA (generados con npm run generate-icons)
+├── scripts/                # Scripts auxiliares (hooks y versionado)
+└── README.md               # Este documento
 ```
 
-## ⚙️ Configuració de Patrons de Torns
+## Instalación y despliegue
 
-L'aplicació inclou un sistema de configuració flexible que permet personalitzar completament els patrons de torns.
+### Prueba local rápida
 
-### Patró per Defecte (28 dies)
+1. Clona o descarga el repositorio.
+2. Si necesitas regenerar los iconos, ejecuta `npm install` (solo la primera vez) y luego `npm run generate-icons` para recrearlos a partir de `icons/icon.svg`.
+3. Abre `index.html` en tu navegador para una prueba básica.
 
-El sistema ve configurat amb un cicle de 4 setmanes amb alternància entre setmanes llargues i curtes:
+> Para probar todas las capacidades PWA (Service Worker, instalación, modo offline) sirve el proyecto desde un servidor local: `python -m http.server 8000`, `http-server -p 8000` o la extensión **Live Server** de VS Code.
 
-**Setmana 1 - Llarga A:** A, L, V, L, A, A, A
-**Setmana 2 - Curta V:** L, V, L, A, L, L, L
-**Setmana 3 - Llarga V:** V, L, A, L, V, V, V
-**Setmana 4 - Curta A:** L, A, L, V, L, L, L
+### Instalación como PWA
 
-**Llegenda:** A = Torn A | V = Torn V | L = Lliure
+1. Con la app servida mediante HTTPS/localhost, abre Chrome/Edge/Safari.
+2. Pulsa el icono de instalación de la barra de direcciones.
+3. La aplicación se añadirá a tu escritorio y funcionará offline.
+4. Para probar el modo offline marca "Offline" en *DevTools → Application → Service Workers* y recarga.
 
-### Personalitzar el Patró
+### Despliegue en producción
 
-Pots crear el teu propi patró de torns:
+- **GitHub Pages**: activa `Settings → Pages` sobre `main` y espera unos minutos.
+- **Netlify/Vercel**: arrastra la carpeta o conecta el repo; sirven HTTPS automáticamente.
+- **Servidor propio**: sube todos los archivos estáticos y habilita HTTPS.
 
-1. Fes clic a **"Personalizar Patrón"**
-2. Defineix:
-   - **Durada del cicle**: Nombre de dies del patró (ex: 5, 7, 14, 28, etc.)
-   - **Noms dels torns**: Lletres o codis per identificar cada torn (ex: M, T, N, L)
-   - **Patró**: Seqüència de torns separats per comes
-3. Fes clic a **"Guardar Configuración"**
+## Uso y configuración
 
-#### Exemples de Configuracions
+### Configuración del patrón
 
-**Cicle de 5 dies (torn rotatiu de matí/tarda/nit):**
-- Durada: 5
-- Noms: M, T, N, L
-- Patró: M, T, N, L, L
+1. Haz clic en **“Personalizar Patrón”**.
+2. Define duración del ciclo, nombres de turnos y la secuencia (separada por comas).
+3. Guarda los cambios. Si el ciclo no es múltiplo de 7 se muestra una advertencia recordando que la fecha inicial debe coincidir con la primera aparición del turno.
 
-**Cicle de 7 dies (setmana completa):**
-- Durada: 7
-- Noms: A, B, L
-- Patró: A, A, A, B, B, L, L
+**Patrón por defecto (28 días)**
 
-**Cicle de 14 dies:**
-- Durada: 14
-- Noms: D, N, L
-- Patró: D, D, D, D, D, N, N, N, N, N, L, L, L, L
+- Semana 1 (Larga A): `A, L, V, L, A, A, A`
+- Semana 2 (Corta V): `L, V, L, A, L, L, L`
+- Semana 3 (Larga V): `V, L, A, L, V, V, V`
+- Semana 4 (Corta A): `L, A, L, V, L, L, L`
 
-### Notes Importants
+Puedes restablecerlo en cualquier momento con **“Restaurar por defecto”**.
 
-- **Cicles múltiples de 7 dies** (7, 14, 21, 28...): L'algoritme alinea automàticament el patró amb els dies de la setmana
-- **Altres cicles** (5, 6, 10...): La data d'inici ha de correspondre a la primera aparició del torn al patró
+### Flujo de uso
 
-## 🛠️ Instal·lació i Ús
+1. Configura (opcional) el patrón.
+2. Selecciona la **fecha de inicio** y el **turno que le corresponde**.
+3. Introduce la fecha objetivo y pulsa **“Calcular turno”**.
+4. Usa los botones de exportación cuando quieras generar el calendario anual.
 
-### Ús Local
+## Exportaciones disponibles
 
-1. Clona o descarrega el projecte
-2. Obre `icons/generate-icons.html` en un navegador
-3. Descarrega totes les icones generades i desa-les a la carpeta `icons/`
-4. Obre `index.html` en un navegador web
-5. L'aplicació ja està llesta per utilitzar!
+- **CSV**: listado completo `Fecha,Turno`, ideal para Excel/Sheets.
+- **PDF**: calendario anual en una página A4 con leyenda dinámica, indicadores de fin de semana (“Fin de semana”) y colores asignados automáticamente.
+- **ICS**: genera eventos de día completo para turnos distintos de `L`, listos para cualquier calendario iCal.
 
-### Instal·lar com a PWA
+## Sistema de actualizaciones PWA
 
-1. Obre l'aplicació en Chrome, Edge o Safari
-2. Fes clic a la icona d'instal·lar a la barra d'adreces
-3. Confirma la instal·lació
-4. L'aplicació s'afegirà al teu escriptori/pantalla d'inici
-5. Poràs utilitzar-la sense connexió a Internet!
+- La app comprueba nuevas versiones **cada hora** y en cada recarga.
+- Cuando detecta cambios (por Service Worker o por `localStorage` en Safari/iOS) aparece un banner con dos acciones: **Actualizar** (recarga o `SKIP_WAITING`) y **Más tarde**.
+- En iOS, los Service Workers solo funcionan cuando la PWA está instalada en la pantalla de inicio; Safari puro requiere refrescar manualmente.
+- El banner se muestra una única vez por versión y desaparece al actualizar o cerrarlo.
 
-### Desplegar en un Servidor
+**Flujo resumido:** visita → `update-manager.js` consulta → nuevo `CACHE_NAME` → Service Worker instala en segundo plano → banner → clic en “Actualizar” → `SKIP_WAITING` → recarga automática.
 
-Per desplegar l'aplicació en un servidor web:
+## Versionado automático
 
-1. Puja tots els fitxers a un servidor web (Apache, Nginx, GitHub Pages, etc.)
-2. Assegura't que el servidor serveix els fitxers amb HTTPS (requerit per a PWA)
-3. Accedeix a la URL del servidor
-4. L'aplicació estarà disponible i instal·lable com a PWA
+- La versión visible en el footer proviene de `APP_VERSION` (`js/version.js`).
+- Git hooks automáticos incrementan la versión según el prefijo del commit (`feat` → *minor*, `fix/chore` → *patch*, `!*` o BREAKING → *major*).
+- El script `scripts/bump-version.js` mantiene sincronizados `package.json` y `js/version.js`.
+- Para incrementos manuales: `npm run version:patch|minor|major`.
+- Si necesitas omitir el hook en un commit, usa `git commit --no-verify`.
 
-## 📖 Com Funciona
+## Problemas comunes y soporte
 
-### Càlcul de Torns
+| Problema | Solución sugerida |
+| --- | --- |
+| La PWA no se puede instalar | Sirve la app mediante HTTPS, revisa que `manifest.json` y los iconos estén accesibles. |
+| El Service Worker no se registra | Asegúrate de usar un servidor (no `file://`) y revisa la consola del navegador. |
+| Exportaciones fallan | Comprueba que las librerías jsPDF del CDN se cargan correctamente; necesitas conexión. |
+| Banner de actualización no aparece | Incrementa `CACHE_NAME`, despliega y recarga sin cerrar la pestaña; revisa la consola para ver si el SW detecta la nueva versión. |
 
-1. Configura el patró de torns (o utilitza el per defecte)
-2. Selecciona una **data d'inici** i el **torn** corresponent
-3. Selecciona qualsevol **data futura o passada** per calcular el torn
-4. L'aplicació calcula automàticament quin torn correspon
+Si tienes dudas:
+1. Abre DevTools (F12) y revisa la consola.
+2. Comprueba que todos los archivos estén en su ruta correcta.
+3. Revisa este README para confirmar pasos de instalación/despliegue.
+4. Crea un issue en el repositorio si necesitas ayuda adicional.
 
-### Exportacions
+## Tecnologías y compatibilidad
 
-#### CSV
-Format simple de text separat per comes, ideal per importar a Excel o Google Sheets.
-- Conté totes les dates de l'any amb el torn corresponent
-- Compatible amb qualsevol fulls de càlcul
+- **Tecnologías**: HTML5, CSS3, JavaScript ES6+, `localStorage`, jsPDF, Service Worker, Web App Manifest.
+- **Compatibilidad**: Chrome/Edge 67+, Firefox 63+, Safari 11.1+, Opera 54+, iOS y Android (como PWA o en navegador moderno).
 
-#### PDF
-Calendari anual elegant en format apaisat amb:
-- Tots els 12 mesos en una sola pàgina A4
-- **Colors dinàmics** generats automàticament per a cada torn
-- Llegenda adaptativa segons els torns configurats
-- Disseny professional i fàcil de llegir
+## Contribuir
 
-#### ICS (iCalendar)
-Format estàndard de calendari compatible amb:
-- Google Calendar
-- Apple Calendar
-- Microsoft Outlook
-- Qualsevol aplicació compatible amb iCalendar
+1. Haz un fork del repositorio.
+2. Crea una rama (`git checkout -b feature/mi-funcionalidad`).
+3. Realiza tus cambios y commits (los hooks ajustarán la versión si procede).
+4. `git push` a tu fork y abre un Pull Request.
 
-Els esdeveniments es creen com a "tot el dia" i només s'inclouen els dies de treball (excloent els dies lliures "L").
+## Licencia y contacto
 
-## 🔧 Tecnologies Utilitzades
-
-- **HTML5**: Estructura semàntica
-- **CSS3**: Estils moderns amb gradients i animacions
-- **JavaScript (ES6+)**: Lògica de l'aplicació
-- **localStorage**: Persistència de configuracions
-- **jsPDF**: Generació de PDFs amb colors dinàmics
-- **Service Worker**: Funcionament offline i caché intel·ligent
-- **Web App Manifest**: PWA completa
-
-## 📱 Compatibilitat
-
-- ✅ Chrome/Edge (versió 67+)
-- ✅ Firefox (versió 63+)
-- ✅ Safari (versió 11.1+)
-- ✅ Opera (versió 54+)
-- ✅ Dispositius mòbils (iOS i Android)
-
-## 🤝 Contribuir
-
-Les contribucions són benvingudes! Si vols millorar l'aplicació:
-
-1. Fes un fork del projecte
-2. Crea una branca per a la teva funcionalitat (`git checkout -b feature/nova-funcionalitat`)
-3. Fes commit dels canvis (`git commit -m 'Afegir nova funcionalitat'`)
-4. Puja els canvis (`git push origin feature/nova-funcionalitat`)
-5. Obre un Pull Request
-
-## 📄 Llicència
-
-Aquest projecte és de codi obert i està disponible sota la llicència MIT.
-
-## 📧 Contacte
-
-Per a preguntes o suggeriments, si us plau obre un issue al repositori.
+- Proyecto publicado bajo licencia **MIT**.
+- Para preguntas o sugerencias abre un issue; estaremos atentos.
 
 ---
 
-Fet amb ❤️ per facilitar la gestió de torns de treball
+Creado para facilitar la planificación de turnos de trabajo.

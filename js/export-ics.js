@@ -1,12 +1,10 @@
-/**
- * Mòdul d'exportació ICS (iCalendar)
- * Gestiona l'exportació dels torns a format ICS per a Google Calendar
+﻿/**
+ * ICS export module (iCalendar)
+ * Generates an ICS file compatible with Google Calendar, Apple Calendar, etc.
  */
 
 /**
- * Formatea una fecha en formato ICS (YYYYMMDD)
- * @param {Date} fecha - Fecha a formatear
- * @returns {string} Fecha en formato ICS
+ * Formats a date in ICS format (YYYYMMDD)
  */
 function formatearFechaICS(fecha) {
   const year = fecha.getFullYear();
@@ -16,9 +14,7 @@ function formatearFechaICS(fecha) {
 }
 
 /**
- * Formatea una fecha/hora en formato ICS
- * @param {Date} fecha - Fecha a formatear
- * @returns {string} Fecha/hora en formato ICS
+ * Formats a date/time string for ICS payloads
  */
 function formatearFechaHoraICS(fecha) {
   const year = fecha.getFullYear();
@@ -31,44 +27,41 @@ function formatearFechaHoraICS(fecha) {
 }
 
 /**
- * Exporta los turnos anuales a formato ICS (iCalendar)
- * @param {Date} fechaInicio - Fecha de inicio
- * @param {string} turnoInicio - Turno correspondiente a la fecha de inicio
+ * Exports the yearly shifts to ICS (iCalendar)
  */
 function exportarICS(fechaInicio, turnoInicio) {
   const config = obtenerConfiguracion();
   const datos = generarTurnosAnuales(fechaInicio, turnoInicio, config);
   const { year, turnos } = datos;
 
-  // Generar contenido ICS
+  // Build ICS payload
   let icsContent = 'BEGIN:VCALENDAR\r\n';
   icsContent += 'VERSION:2.0\r\n';
-  icsContent += 'PRODID:-//Calculadora de Torns//ES\r\n';
+  icsContent += 'PRODID:-//Calculadora de Turnos//ES\r\n';
   icsContent += 'CALSCALE:GREGORIAN\r\n';
   icsContent += 'METHOD:PUBLISH\r\n';
-  icsContent += 'X-WR-CALNAME:Torns de Treball ' + year + '\r\n';
+  icsContent += 'X-WR-CALNAME:Turnos de trabajo ' + year + '\r\n';
   icsContent += 'X-WR-TIMEZONE:Europe/Madrid\r\n';
-  icsContent += 'X-WR-CALDESC:Calendari de torns de treball per a l\'any ' + year + '\r\n';
+  icsContent += 'X-WR-CALDESC:Calendario de turnos de trabajo para el año ' + year + '\r\n';
 
   const ahora = new Date();
   const dtstamp = formatearFechaHoraICS(ahora);
 
-  // Solo incluir eventos de turnos (excluir días libres si existe 'L')
+  // Only include shifts that are not marked as "L" (Libre)
   turnos.forEach((item, index) => {
-    // Excluir solo si el turno es 'L' (libre)
     if (item.turno !== 'L') {
       const fechaInicioEvento = formatearFechaICS(item.fecha);
 
-      // Calcular fecha de fin (día siguiente)
+      // The end date is the following day because events are full-day blocks
       const fechaFin = new Date(item.fecha);
       fechaFin.setDate(fechaFin.getDate() + 1);
       const fechaFinStr = formatearFechaICS(fechaFin);
 
       const nombreTurno = `${item.turno}`;
-      const descripcion = `${nombreTurno} - Jornada de treball`;
+      const descripcion = `${nombreTurno} - Jornada de trabajo`;
 
       icsContent += 'BEGIN:VEVENT\r\n';
-      icsContent += 'UID:' + year + '-' + fechaInicioEvento + '-' + item.turno + '-' + index + '@calculadora-torns\r\n';
+      icsContent += 'UID:' + year + '-' + fechaInicioEvento + '-' + item.turno + '-' + index + '@calculadora-turnos\r\n';
       icsContent += 'DTSTAMP:' + dtstamp + '\r\n';
       icsContent += 'DTSTART;VALUE=DATE:' + fechaInicioEvento + '\r\n';
       icsContent += 'DTEND;VALUE=DATE:' + fechaFinStr + '\r\n';
@@ -82,12 +75,12 @@ function exportarICS(fechaInicio, turnoInicio) {
 
   icsContent += 'END:VCALENDAR\r\n';
 
-  // Crear blob y descargar
+  // Trigger download
   const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
   link.setAttribute('href', url);
-  link.setAttribute('download', `Torns_${year}.ics`);
+  link.setAttribute('download', `Turnos_${year}.ics`);
   link.style.visibility = 'hidden';
   document.body.appendChild(link);
   link.click();

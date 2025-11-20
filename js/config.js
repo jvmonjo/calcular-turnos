@@ -1,20 +1,16 @@
-/**
- * Mòdul de configuració
- * Gestiona la interfície de configuració del patró de torns
- */
-
-/**
- * Inicialitza la interfície de configuració
+﻿/**
+ * Configuration module
+ * Handles the UI for editing the shift pattern
  */
 function inicializarConfiguracion() {
   const config = obtenerConfiguracion();
 
-  // Poblar els camps amb la configuració actual
+  // Populate fields with the current configuration
   document.getElementById('duracionCiclo').value = config.duracionCiclo;
   document.getElementById('nombresTurnos').value = config.nombresTurnos.join(',');
   document.getElementById('patronTurnos').value = config.secuenciaTurnos.join(',');
 
-  // Poblar el select de turnos
+  // Populate the select element used in the main form
   actualizarSelectTurnos(config.nombresTurnos);
 
   // Event listeners
@@ -22,16 +18,16 @@ function inicializarConfiguracion() {
   document.getElementById('guardarConfig').addEventListener('click', guardarConfiguracionDesdeUI);
   document.getElementById('resetConfig').addEventListener('click', resetearConfiguracion);
 
-  // Actualizar cuando cambie la duración del ciclo
+  // Update placeholders when the cycle length changes
   document.getElementById('duracionCiclo').addEventListener('input', function() {
-    const duracion = parseInt(this.value);
+    const duracion = parseInt(this.value, 10);
     document.getElementById('patronTurnos').placeholder =
       `Introduce ${duracion} turnos separados por comas`;
 
-    // Mostrar advertencia si no es múltiplo de 7
+    // Show a warning when the cycle is not a multiple of 7
     const mensaje = document.getElementById('configMensaje');
     if (duracion % 7 !== 0) {
-      mensaje.innerHTML = '<div style="color: orange; margin-top: 10px;">⚠️ Nota: Para ciclos que no son múltiplos de 7 días, la fecha de inicio debe corresponder a la primera aparición del turno en el patrón.</div>';
+      mensaje.innerHTML = '<div style="color: orange; margin-top: 10px;">⚠️ Nota: para ciclos que no son múltiplos de 7 días, la fecha de inicio debe corresponder a la primera aparición del turno en el patrón.</div>';
     } else {
       mensaje.innerHTML = '';
     }
@@ -39,7 +35,7 @@ function inicializarConfiguracion() {
 }
 
 /**
- * Muestra/oculta el panel de configuración
+ * Toggles the configuration panel visibility
  */
 function toggleConfigPanel() {
   const panel = document.getElementById('configPanel');
@@ -47,15 +43,15 @@ function toggleConfigPanel() {
 
   if (panel.style.display === 'none') {
     panel.style.display = 'block';
-    button.textContent = 'Ocultar Configuración';
+    button.textContent = 'Ocultar configuración';
   } else {
     panel.style.display = 'none';
-    button.textContent = 'Personalizar Patrón';
+    button.textContent = 'Personalizar patrón';
   }
 }
 
 /**
- * Actualiza el select de turnos según los nombres configurados
+ * Refreshes the select element used to choose the starting shift
  */
 function actualizarSelectTurnos(nombresTurnos) {
   const select = document.getElementById('turnoInicio');
@@ -70,40 +66,40 @@ function actualizarSelectTurnos(nombresTurnos) {
 }
 
 /**
- * Guarda la configuración desde la interfaz
+ * Saves the configuration based on the UI inputs
  */
 function guardarConfiguracionDesdeUI() {
-  const duracionCiclo = parseInt(document.getElementById('duracionCiclo').value);
+  const duracionCiclo = parseInt(document.getElementById('duracionCiclo').value, 10);
   const nombresTurnosStr = document.getElementById('nombresTurnos').value;
   const patronTurnosStr = document.getElementById('patronTurnos').value;
 
-  // Parsear los nombres de turnos
+  // Parse the list of shift codes
   const nombresTurnos = nombresTurnosStr.split(',').map(t => t.trim()).filter(t => t.length > 0);
 
-  // Parsear el patrón
+  // Parse the configured pattern
   const secuenciaTurnos = patronTurnosStr.split(',').map(t => t.trim()).filter(t => t.length > 0);
 
-  // Crear configuración
+  // Build the configuration object
   const config = {
     duracionCiclo,
     nombresTurnos,
     secuenciaTurnos
   };
 
-  // Validar
+  // Validate
   const validacion = validarConfiguracion(config);
   const mensaje = document.getElementById('configMensaje');
 
   if (!validacion.valido) {
-    mensaje.innerHTML = `<div style="color: red; margin-top: 10px;">❌ ${validacion.mensaje}</div>`;
+    mensaje.innerHTML = `<div style="color: red; margin-top: 10px;">⚠️ ${validacion.mensaje}</div>`;
     return;
   }
 
-  // Guardar
+  // Persist
   guardarConfiguracion(config);
   actualizarSelectTurnos(nombresTurnos);
 
-  mensaje.innerHTML = '<div style="color: green; margin-top: 10px;">✅ Configuración guardada correctamente</div>';
+  mensaje.innerHTML = '<div style="color: green; margin-top: 10px;">✅ Configuración guardada correctamente.</div>';
 
   setTimeout(() => {
     mensaje.innerHTML = '';
@@ -111,7 +107,7 @@ function guardarConfiguracionDesdeUI() {
 }
 
 /**
- * Resetea la configuración a los valores por defecto
+ * Restores the default configuration
  */
 function resetearConfiguracion() {
   if (confirm('¿Estás seguro de que quieres restaurar la configuración por defecto?')) {
@@ -125,7 +121,7 @@ function resetearConfiguracion() {
     actualizarSelectTurnos(config.nombresTurnos);
 
     const mensaje = document.getElementById('configMensaje');
-    mensaje.innerHTML = '<div style="color: green; margin-top: 10px;">✅ Configuración restaurada por defecto</div>';
+    mensaje.innerHTML = '<div style="color: green; margin-top: 10px;">✅ Configuración restaurada por defecto.</div>';
 
     setTimeout(() => {
       mensaje.innerHTML = '';
@@ -133,7 +129,7 @@ function resetearConfiguracion() {
   }
 }
 
-// Inicializar cuando cargue el DOM
+// Initialize when the DOM is ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', inicializarConfiguracion);
 } else {

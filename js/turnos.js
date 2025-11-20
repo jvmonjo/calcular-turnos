@@ -1,28 +1,28 @@
-/**
- * Mòdul de càlcul de torns
- * Conté la lògica principal per calcular els torns segons el patró configurable
+﻿/**
+ * Shift calculation module
+ * Contains the core logic to compute shifts based on the configurable pattern
  */
 
 /**
- * Configuració per defecte del patró de torns
+ * Default shift pattern configuration
  */
 const CONFIG_DEFAULT = {
   duracionCiclo: 28,
   nombresTurnos: ['A', 'V', 'L'],
   secuenciaTurnos: [
-    // Semana 1: Larga A (empieza lunes)
-    "A", "L", "V", "L", "A", "A", "A",
-    // Semana 2: Corta V
-    "L", "V", "L", "A", "L", "L", "L",
-    // Semana 3: Larga V
-    "V", "L", "A", "L", "V", "V", "V",
-    // Semana 4: Corta A
-    "L", "A", "L", "V", "L", "L", "L"
+    // Week 1: Long A (starts Monday)
+    'A', 'L', 'V', 'L', 'A', 'A', 'A',
+    // Week 2: Short V
+    'L', 'V', 'L', 'A', 'L', 'L', 'L',
+    // Week 3: Long V
+    'V', 'L', 'A', 'L', 'V', 'V', 'V',
+    // Week 4: Short A
+    'L', 'A', 'L', 'V', 'L', 'L', 'L'
   ]
 };
 
 /**
- * Obtiene la configuración actual (desde localStorage o por defecto)
+ * Retrieves the active configuration (from localStorage or default)
  */
 function obtenerConfiguracion() {
   const configGuardada = localStorage.getItem('configuracionTurnos');
@@ -30,7 +30,7 @@ function obtenerConfiguracion() {
     try {
       return JSON.parse(configGuardada);
     } catch (e) {
-      console.error('Error al cargar configuración:', e);
+      console.error('Error al cargar la configuración:', e);
       return CONFIG_DEFAULT;
     }
   }
@@ -38,32 +38,32 @@ function obtenerConfiguracion() {
 }
 
 /**
- * Guarda la configuración en localStorage
+ * Persists the configuration in localStorage
  */
 function guardarConfiguracion(config) {
   localStorage.setItem('configuracionTurnos', JSON.stringify(config));
 }
 
 /**
- * Valida que la configuración sea correcta
+ * Validates the configuration
  */
 function validarConfiguracion(config) {
   if (!config.duracionCiclo || config.duracionCiclo < 1) {
-    return { valido: false, mensaje: 'La duración del ciclo debe ser al menos 1 día' };
+    return { valido: false, mensaje: 'La duración del ciclo debe ser al menos de 1 día.' };
   }
 
   if (!config.nombresTurnos || config.nombresTurnos.length === 0) {
-    return { valido: false, mensaje: 'Debe definir al menos un nombre de turno' };
+    return { valido: false, mensaje: 'Debes definir al menos un nombre de turno.' };
   }
 
   if (!config.secuenciaTurnos || config.secuenciaTurnos.length !== config.duracionCiclo) {
-    return { valido: false, mensaje: `El patrón debe tener exactamente ${config.duracionCiclo} días` };
+    return { valido: false, mensaje: `El patrón debe tener exactamente ${config.duracionCiclo} días.` };
   }
 
-  // Verificar que todos los turnos del patrón estén en los nombres definidos
-  for (let turno of config.secuenciaTurnos) {
+  // Make sure every code used in the pattern exists in the declared names
+  for (const turno of config.secuenciaTurnos) {
     if (!config.nombresTurnos.includes(turno)) {
-      return { valido: false, mensaje: `El turno "${turno}" no está definido en los nombres de turnos` };
+      return { valido: false, mensaje: `El turno "${turno}" no está definido en la lista de nombres.` };
     }
   }
 
@@ -71,11 +71,11 @@ function validarConfiguracion(config) {
 }
 
 /**
- * Función para calcular el índice inicial basándose en la fecha de inicio y el turno
- * @param {Date} fechaInicio - Fecha de inicio
- * @param {string} turnoInicio - Turno correspondiente a la fecha de inicio
- * @param {Object} config - Configuración del patrón (opcional, usa la guardada por defecto)
- * @returns {number} - Índice del turno inicial en el ciclo
+ * Calculates the starting index based on the provided date and shift
+ * @param {Date} fechaInicio
+ * @param {string} turnoInicio
+ * @param {Object} config
+ * @returns {number}
  */
 function calcularIndiceInicio(fechaInicio, turnoInicio, config = null) {
   if (!config) {
@@ -84,14 +84,14 @@ function calcularIndiceInicio(fechaInicio, turnoInicio, config = null) {
 
   const duracionCiclo = config.secuenciaTurnos.length;
 
-  // Si el ciclo es múltiplo de 7, usar el algoritmo basado en día de la semana
+  // If the cycle is a multiple of 7 we can align it with weekdays
   if (duracionCiclo % 7 === 0) {
-    // Obtener día de la semana (0 = Domingo, 1 = Lunes, ..., 6 = Sábado)
+    // JS: 0 = Sunday, 1 = Monday ... 6 = Saturday
     let diaSemana = fechaInicio.getDay();
-    // Convertir a formato donde Lunes = 0, Martes = 1, ..., Domingo = 6
+    // Convert so Monday = 0 ... Sunday = 6
     diaSemana = diaSemana === 0 ? 6 : diaSemana - 1;
 
-    // Buscar todas las posiciones donde el día de la semana y el turno coinciden
+    // Collect every position where weekday and shift match
     const posiblesIndices = [];
     for (let i = 0; i < config.secuenciaTurnos.length; i++) {
       const diaSemanaEnCiclo = i % 7;
@@ -100,66 +100,62 @@ function calcularIndiceInicio(fechaInicio, turnoInicio, config = null) {
       }
     }
 
-    // Si solo hay una coincidencia, usarla
     if (posiblesIndices.length === 1) {
       return posiblesIndices[0];
     }
 
-    // Si hay múltiples coincidencias, retornar la primera
     return posiblesIndices.length > 0 ? posiblesIndices[0] : -1;
   } else {
-    // Para ciclos que no son múltiplos de 7, buscar simplemente el turno
-    // El usuario debe especificar qué posición del ciclo corresponde a la fecha de inicio
+    // For arbitrary cycles just find the first matching shift
     const indice = config.secuenciaTurnos.indexOf(turnoInicio);
 
     if (indice === -1) {
-      throw new Error(`El turno "${turnoInicio}" no existe en el patrón configurado`);
+      throw new Error(`El turno "${turnoInicio}" no existe en el patrón configurado.`);
     }
 
-    // Retornar el primer índice donde aparece el turno
-    // NOTA: Para ciclos no múltiplos de 7, el usuario debe asegurarse de que
-    // la fecha de inicio corresponda a la primera aparición del turno en el ciclo
+    // NOTE: for cycles that are not multiples of 7 the start date must match
+    // the first appearance of the chosen shift in the cycle
     return indice;
   }
 }
 
 /**
- * Función para calcular el turno que corresponde a una fecha específica
- * @param {Date} fechaInicio - Fecha de inicio
- * @param {string} turnoInicio - Turno correspondiente a la fecha de inicio
- * @param {Date} fechaObjetivo - Fecha para calcular el turno
- * @param {Object} config - Configuración del patrón (opcional, usa la guardada por defecto)
- * @returns {string} - Turno correspondiente
+ * Calculates the shift assigned to a specific date
+ * @param {Date} fechaInicio
+ * @param {string} turnoInicio
+ * @param {Date} fechaObjetivo
+ * @param {Object} config
+ * @returns {string}
  */
 function calcularTurno(fechaInicio, turnoInicio, fechaObjetivo, config = null) {
   if (!config) {
     config = obtenerConfiguracion();
   }
 
-  // Normalizar fechas a medianoche para evitar problemas con horas
+  // Normalize dates to midnight to avoid DST issues
   const inicio = new Date(fechaInicio);
   inicio.setHours(0, 0, 0, 0);
 
   const objetivo = new Date(fechaObjetivo);
   objetivo.setHours(0, 0, 0, 0);
 
-  // Calcular diferencia en días usando UTC para evitar problemas con cambio de hora
+  // Calculate difference in days (using UTC to avoid DST issues)
   const inicioUTC = Date.UTC(inicio.getFullYear(), inicio.getMonth(), inicio.getDate());
   const objetivoUTC = Date.UTC(objetivo.getFullYear(), objetivo.getMonth(), objetivo.getDate());
   const diferenciaDias = Math.floor((objetivoUTC - inicioUTC) / (1000 * 60 * 60 * 24));
 
-  // Obtener índice inicial en el ciclo
+  // Get the starting index
   const indiceInicio = calcularIndiceInicio(inicio, turnoInicio, config);
 
   if (indiceInicio === -1) {
-    throw new Error("No se pudo determinar el índice inicial. Verifica la fecha y el turno de inicio.");
+    throw new Error('No se pudo determinar el índice inicial. Verifica la fecha y el turno de inicio.');
   }
 
-  // Calcular índice objetivo en el ciclo
+  // Compute the index within the cycle
   const totalTurnos = config.secuenciaTurnos.length;
   let indiceObjetivo = (indiceInicio + diferenciaDias) % totalTurnos;
 
-  // Ajustar para índices negativos (fechas anteriores a la fecha de inicio)
+  // Adjust for negative indices (dates before the start date)
   if (indiceObjetivo < 0) {
     indiceObjetivo = totalTurnos + indiceObjetivo;
   }
@@ -168,11 +164,11 @@ function calcularTurno(fechaInicio, turnoInicio, fechaObjetivo, config = null) {
 }
 
 /**
- * Genera los datos de turnos para todo un año
- * @param {Date} fechaInicio - Fecha de inicio
- * @param {string} turnoInicio - Turno correspondiente a la fecha de inicio
- * @param {Object} config - Configuración del patrón (opcional, usa la guardada por defecto)
- * @returns {Object} Objeto con el año y array de turnos
+ * Generates the shift data for the whole year of the starting date
+ * @param {Date} fechaInicio
+ * @param {string} turnoInicio
+ * @param {Object} config
+ * @returns {{year: number, turnos: Array}}
  */
 function generarTurnosAnuales(fechaInicio, turnoInicio, config = null) {
   if (!config) {
@@ -182,29 +178,28 @@ function generarTurnosAnuales(fechaInicio, turnoInicio, config = null) {
   const year = fechaInicio.getFullYear();
   const turnos = [];
 
-  // Crear una fecha temporal para iterar
+  // Iterate day by day
   const fechaActual = new Date(year, 0, 1);
 
   while (fechaActual.getFullYear() === year) {
     try {
-      // Crear una copia de la fecha actual para pasarla a calcularTurno
       const fechaCopia = new Date(fechaActual);
       const turno = calcularTurno(fechaInicio, turnoInicio, fechaCopia, config);
 
       turnos.push({
         fecha: new Date(fechaActual),
         fechaStr: fechaActual.toLocaleDateString('es-ES'),
-        turno: turno
+        turno
       });
     } catch (error) {
       turnos.push({
         fecha: new Date(fechaActual),
         fechaStr: fechaActual.toLocaleDateString('es-ES'),
-        turno: "Error"
+        turno: 'Error'
       });
     }
 
-    // Avanzar al día siguiente
+    // Move to the next day
     fechaActual.setDate(fechaActual.getDate() + 1);
   }
 

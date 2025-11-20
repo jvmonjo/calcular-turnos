@@ -1,30 +1,30 @@
 ﻿/**
- * MÃ²dul d'exportaciÃ³ PDF
- * Gestiona l'exportaciÃ³ dels torns a format PDF amb disseny elegant
+ * PDF export module
+ * Builds an annual schedule in PDF with a clean layout
  */
 
 /**
- * Exporta los turnos anuales a formato PDF
- * @param {Date} fechaInicio - Fecha de inicio
- * @param {string} turnoInicio - Turno correspondiente a la fecha de inicio
+ * Exports the yearly shifts to PDF
+ * @param {Date} fechaInicio - Start date
+ * @param {string} turnoInicio - Shift assigned to the start date
  */
 function exportarPDF(fechaInicio, turnoInicio) {
   const config = obtenerConfiguracion();
   const datos = generarTurnosAnuales(fechaInicio, turnoInicio, config);
   const { year, turnos } = datos;
 
-  // Crear documento PDF en formato apaisado
+  // Create landscape PDF document
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('landscape', 'mm', 'a4');
 
-  // Generar colores dinÃ¡micamente para cada turno
+  // Generate colors dynamically for each shift
   const colores = generarColoresTurnos(config.nombresTurnos);
 
-  // Nombres de meses
+  // Month names
   const nombresMeses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
                         'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
-  // Agrupar turnos por mes
+  // Group shifts by month
   const turnosPorMes = {};
   turnos.forEach(item => {
     const mes = item.fecha.getMonth();
@@ -38,13 +38,13 @@ function exportarPDF(fechaInicio, turnoInicio) {
     });
   });
 
-  // TÃ­tulo principal
+  // Main title
   doc.setFontSize(22);
   doc.setFont(undefined, 'bold');
   doc.setTextColor(80, 80, 80);
   doc.text(`Calendario de Turnos ${year}`, doc.internal.pageSize.getWidth() / 2, 15, { align: 'center' });
 
-  // ConfiguraciÃ³n de la cuadrÃ­cula
+  // Grid configuration
   const margenIzq = 15;
   const margenDer = 15;
   const margenSup = 25;
@@ -54,8 +54,8 @@ function exportarPDF(fechaInicio, turnoInicio) {
   const altoCelda = 6;
   const espacioEntreMeses = 2;
 
-  // Dibujar encabezado de dÃ­as de la semana
-  const diasSemana = ['DL', 'DM', 'DC', 'DJ', 'DV', 'DS', 'DG'];
+  // Draw weekday header
+  const diasSemana = ['LU', 'MA', 'MI', 'JU', 'VI', 'SA', 'DO'];
   doc.setFontSize(7);
   doc.setFont(undefined, 'bold');
   doc.setTextColor(80, 80, 80);
@@ -66,21 +66,21 @@ function exportarPDF(fechaInicio, turnoInicio) {
     doc.text(`${i + 1}`, x + anchoCelda / 2, margenSup - 2, { align: 'center' });
   }
 
-  // OpciÃ³ de patrÃ³ per caps de setmana: 'rayas' o 'puntos'
+  // Weekend background pattern: 'rayas' or 'puntos'
   const patronFondoCapDeSetmana = 'rayas';
 
-  // Dibujar cada mes
+  // Draw each month
   doc.setFontSize(9);
   let yPos = margenSup;
 
   for (let mes = 0; mes < 12; mes++) {
-    // Nombre del mes
+    // Month name
     doc.setFontSize(9);
     doc.setFont(undefined, 'bold');
     doc.setTextColor(60, 60, 60);
     doc.text(nombresMeses[mes], margenIzq, yPos + altoCelda / 2 + 1.5);
 
-    // Dibujar celdas de dÃ­as
+    // Draw day cells
     if (turnosPorMes[mes]) {
       const diasEnMes = new Date(year, mes + 1, 0).getDate();
 
@@ -96,7 +96,7 @@ function exportarPDF(fechaInicio, turnoInicio) {
             const esLliure = turnoData.turno === 'L';
 
             if (esLliure) {
-              // Celï¿½les lliures sense fons per reduir cï¿½rrega visual
+              // Empty cells for days off to reduce visual noise
               doc.setDrawColor(220, 220, 220);
               doc.rect(x, yPos, anchoCelda, altoCelda, 'S');
 
@@ -104,17 +104,17 @@ function exportarPDF(fechaInicio, turnoInicio) {
                 aplicarPatronFondo(doc, x, yPos, anchoCelda, altoCelda, patronFondoCapDeSetmana);
               }
             } else {
-              // Fons de la celï¿½la segons el torn
+              // Fill cell based on the shift color
               doc.setFillColor(color[0], color[1], color[2]);
               doc.setDrawColor(200, 200, 200);
               doc.rect(x, yPos, anchoCelda, altoCelda, 'FD');
 
-              // Patrï¿½ per a caps de setmana sobreposat al fons
+              // Overlay weekend pattern on top of the cell
               if (esCapDeSetmana) {
                 aplicarPatronFondo(doc, x, yPos, anchoCelda, altoCelda, patronFondoCapDeSetmana);
               }
 
-              // Texto del turno
+              // Shift label
               doc.setFont(undefined, 'bold');
               doc.setFontSize(7);
               const colorTextoTurno = obtenerColorTextoTurno(turnoData.turno);
@@ -123,7 +123,7 @@ function exportarPDF(fechaInicio, turnoInicio) {
             }
           }
         } else {
-          // Celda vacÃ­a para dÃ­as que no existen en el mes
+          // Empty cell for days that do not exist in the month
           doc.setFillColor(245, 245, 245);
           doc.setDrawColor(230, 230, 230);
           doc.rect(x, yPos, anchoCelda, altoCelda, 'FD');
@@ -134,15 +134,15 @@ function exportarPDF(fechaInicio, turnoInicio) {
     yPos += altoCelda + espacioEntreMeses;
   }
 
-  // Leyenda
-  const separacionLeyenda = 12; // espai addicional per separar de la graella
+  // Legend
+  const separacionLeyenda = 12; // extra spacing to keep the legend away from the grid
   const yLeyenda = yPos + separacionLeyenda;
   doc.setFontSize(9);
   doc.setFont(undefined, 'bold');
   doc.setTextColor(60, 60, 60);
   doc.text('Leyenda:', margenIzq, yLeyenda);
 
-  // Dibujar leyenda dinÃ¡micamente segÃºn los turnos configurados
+  // Draw legend dynamically using the configured shifts
   let xLeyenda = margenIzq + 25;
   config.nombresTurnos.forEach((turno, index) => {
     const color = colores[turno];
@@ -168,7 +168,7 @@ function exportarPDF(fechaInicio, turnoInicio) {
     xLeyenda += 30;
   });
 
-  // Indicador de caps de setmana amb ratlles
+  // Weekend indicator with stripes
   doc.setDrawColor(200, 200, 200);
   doc.setFillColor(255, 255, 255);
   doc.rect(xLeyenda, yLeyenda - 3, 8, 5, 'S');
@@ -177,20 +177,20 @@ function exportarPDF(fechaInicio, turnoInicio) {
   doc.setTextColor(60, 60, 60);
   doc.text('Fin de semana', xLeyenda + 12, yLeyenda);
 
-  // Peu de pÃ gina amb data de generaciÃ³
+  // Footer with generation date
   const pageHeight = doc.internal.pageSize.getHeight();
   const pageWidth = doc.internal.pageSize.getWidth();
 
   doc.setFontSize(8);
   doc.setTextColor(150, 150, 150);
-  doc.text(`Generado: ${new Date().toLocaleDateString('ca-ES')}`, pageWidth / 2, pageHeight - 5, { align: 'center' });
+  doc.text(`Generado: ${new Date().toLocaleDateString('es-ES')}`, pageWidth / 2, pageHeight - 5, { align: 'center' });
 
-  // Descargar PDF
+  // Download PDF
   doc.save(`Calendario_Turnos_${year}.pdf`);
 }
 
 /**
- * Genera colores automÃ¡ticamente para cada turno
+ * Generates default colors for each shift
  */
 function generarColoresTurnos(nombresTurnos) {
   const coloresPredefinidos = {
@@ -221,19 +221,19 @@ function generarColoresTurnos(nombresTurnos) {
 }
 
 /**
- * Obtiene el color de texto apropiado segÃºn el color de fondo
+ * Returns the proper text color for a given background
  */
 function obtenerColorTexto(colorFondo) {
-  // Si el color es muy claro, usar texto oscuro
+  // Use dark text when the background is very light
   const luminancia = (colorFondo[0] * 0.299 + colorFondo[1] * 0.587 + colorFondo[2] * 0.114);
   if (luminancia > 186) {
-    return [60, 60, 60]; // Texto oscuro
+    return [60, 60, 60]; // Dark text
   }
-  return [255, 255, 255]; // Texto claro
+  return [255, 255, 255]; // Light text
 }
 
 /**
- * Retorna el color de text emprat per a cada codi de torn
+ * Returns the custom text color for each shift code
  */
 function obtenerColorTextoTurno(turno) {
   if (turno === 'A') {
@@ -246,15 +246,15 @@ function obtenerColorTextoTurno(turno) {
 }
 
 /**
- * Dibuixa un patrÃ³ de fons dins d'un rectangle (caps de setmana)
- * tipus: 'rayas' | 'puntos'
+ * Draws a background pattern inside a rectangle (used for weekends)
+ * type: 'rayas' | 'puntos'
  */
 function aplicarPatronFondo(doc, x, y, w, h, tipus = 'rayas') {
-  // Color suau per al patro perque funcioni sobre colors clars (mes difuminat)
+  // Soft tone for the pattern so it works on light cells
   const colorPatron = [160, 160, 160];
 
   if (tipus === 'puntos') {
-    // Graella de punts
+    // Dot grid
     doc.setFillColor(colorPatron[0], colorPatron[1], colorPatron[2]);
     const pasX = 2.5;
     const pasY = 2.5;
@@ -265,15 +265,15 @@ function aplicarPatronFondo(doc, x, y, w, h, tipus = 'rayas') {
       }
     }
   } else {
-    // Ratlles obliques (45 graus) amb angle constant a tota la cella
+    // Diagonal stripes (45 degrees) with a constant angle across the cell
     doc.setDrawColor(colorPatron[0], colorPatron[1], colorPatron[2]);
     if (typeof doc.setLineCap === 'function') {
       doc.setLineCap('round');
     }
     doc.setLineWidth(0.12);
 
-    const pas = 2.4; // separacio regular entre ratlles (mm)
-    // Construir totes les rectes de 45 graus garantint el mateix angle a tota la cella
+    const pas = 2.4; // regular spacing between stripes (mm)
+    // Build every diagonal line so the angle stays consistent across the cell
     for (let offset = -h; offset <= w; offset += pas) {
       const punts = [];
 
@@ -303,4 +303,13 @@ function aplicarPatronFondo(doc, x, y, w, h, tipus = 'rayas') {
     }
   }
 }
+
+
+
+
+
+
+
+
+
 
