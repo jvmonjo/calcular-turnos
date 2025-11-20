@@ -1,57 +1,61 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 
 /**
  * Version bump helper
- * Updates package.json and js/version.js to keep everything in sync
+ * Updates package.json and js/version.js in sync
  */
 
 const fs = require('fs');
 const path = require('path');
 
-// Increment type: patch (1.0.0 -> 1.0.1), minor (1.0.0 -> 1.1.0), major (1.0.0 -> 2.0.0)
-const type = process.argv[2] || 'patch';
+const increment = (process.argv[2] || 'patch').toLowerCase();
 
-// Read package.json
 const packagePath = path.join(__dirname, '..', 'package.json');
-const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+const versionPath = path.join(__dirname, '..', 'js', 'version.js');
 
-// Parse current version
-const [major, minor, patch] = packageJson.version.split('.').map(Number);
+const pkg = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+const previousVersion = pkg.version;
+const [major, minor, patch] = previousVersion.split('.').map(Number);
 
-// Calculate new version
-let newVersion;
-switch (type) {
+let nextMajor = major;
+let nextMinor = minor;
+let nextPatch = patch;
+
+switch (increment) {
   case 'major':
-    newVersion = ${major + 1}.0.0;
+    nextMajor += 1;
+    nextMinor = 0;
+    nextPatch = 0;
     break;
   case 'minor':
-    newVersion = ${major}..0;
+    nextMinor += 1;
+    nextPatch = 0;
     break;
   case 'patch':
   default:
-    newVersion = ${major}..;
+    nextPatch += 1;
     break;
 }
 
-console.log(Incrementando versión:  -> );
+const newVersion = `${nextMajor}.${nextMinor}.${nextPatch}`;
+const cacheVersion = `v${nextMajor}-${nextMinor}-${nextPatch}`;
 
-// Update package.json
-packageJson.version = newVersion;
-fs.writeFileSync(packagePath, JSON.stringify(packageJson, null, 2) + '\n');
+console.log(`Incrementando versión: ${previousVersion} -> ${newVersion}`);
 
-// Update js/version.js
-const versionPath = path.join(__dirname, '..', 'js', 'version.js');
-const versionContent = /**
+pkg.version = newVersion;
+fs.writeFileSync(packagePath, JSON.stringify(pkg, null, 2) + '\n');
+
+const versionFile = `/**
  * Application version helpers
  * Keeps the version in sync across the UI, Service Worker and update system
  */
 
-const APP_VERSION = '';
-const CACHE_VERSION = 'v';
-;
+const APP_VERSION = '${newVersion}';
+const CACHE_VERSION = '${cacheVersion}';
+`;
 
-fs.writeFileSync(versionPath, versionContent);
+fs.writeFileSync(versionPath, versionFile);
 
 console.log('✅ package.json actualizado');
 console.log('✅ js/version.js actualizado');
-console.log(Nueva versión: );
+console.log(`Nueva versión: ${newVersion}`);

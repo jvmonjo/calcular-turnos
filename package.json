@@ -1,6 +1,6 @@
-﻿{
+{
   "name": "calcular-turnos",
-  "version": "1.2.10",
+  "version": "1.2.11",
   "description": "Aplicación PWA para calcular turnos",
   "scripts": {
     "generate-icons": "node icons/generate-icons.js",
