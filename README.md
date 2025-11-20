@@ -1,6 +1,6 @@
 # Calculadora de Turnos
 
-Aplicación web progresiva (PWA) para calcular y gestionar turnos de trabajo con patrones totalmente personalizables. Todo el material de referencia (instalación, uso, actualizaciones y versionado) se centraliza en este README para que no tengas que consultar varios archivos.
+Aplicación web progresiva (PWA) para calcular y gestionar turnos de trabajo con patrones totalmente personalizables.
 
 ## Contenido
 
