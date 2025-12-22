@@ -1,4 +1,0 @@
-#!/bin/sh
-
-# commit-msg: no action (the bump happens in pre-commit)
-exit 0
