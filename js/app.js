@@ -4,7 +4,7 @@
  */
 
 // Handle form submission
-document.getElementById('turnoForm').addEventListener('submit', function(event) {
+document.getElementById('turnoForm').addEventListener('submit', function (event) {
   event.preventDefault();
 
   // Read dates and create Date objects in local time
@@ -27,8 +27,8 @@ document.getElementById('turnoForm').addEventListener('submit', function(event) 
   }
 });
 
-// Export shifts to CSV
-document.getElementById('exportarCSV').addEventListener('click', function() {
+// Export shifts to Google Calendar (CSV)
+document.getElementById('exportarGoogle').addEventListener('click', function () {
   const inicioValue = document.getElementById('inicio').value;
   const fechaInicio = new Date(inicioValue + 'T00:00:00');
   const turnoInicio = document.getElementById('turnoInicio').value;
@@ -38,11 +38,11 @@ document.getElementById('exportarCSV').addEventListener('click', function() {
     return;
   }
 
-  exportarCSV(fechaInicio, turnoInicio);
+  exportarGoogleCalendar(fechaInicio, turnoInicio);
 });
 
 // Export shifts to PDF
-document.getElementById('exportarPDF').addEventListener('click', function() {
+document.getElementById('exportarPDF').addEventListener('click', function () {
   const inicioValue = document.getElementById('inicio').value;
   const fechaInicio = new Date(inicioValue + 'T00:00:00');
   const turnoInicio = document.getElementById('turnoInicio').value;
@@ -56,7 +56,7 @@ document.getElementById('exportarPDF').addEventListener('click', function() {
 });
 
 // Export shifts to ICS
-document.getElementById('exportarICS').addEventListener('click', function() {
+document.getElementById('exportarICS').addEventListener('click', function () {
   const inicioValue = document.getElementById('inicio').value;
   const fechaInicio = new Date(inicioValue + 'T00:00:00');
   const turnoInicio = document.getElementById('turnoInicio').value;
@@ -70,7 +70,7 @@ document.getElementById('exportarICS').addEventListener('click', function() {
 });
 
 // Display version in footer
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   const versionElement = document.getElementById('app-version');
   if (versionElement) {
     versionElement.textContent = `v${APP_VERSION}`;

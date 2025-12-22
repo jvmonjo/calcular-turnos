@@ -14,7 +14,7 @@ const urlsToCache = [
   './js/version.js',
   './js/turnos.js',
   './js/config.js',
-  './js/export-csv.js',
+  './js/export-google.js',
   './js/export-pdf.js',
   './js/export-ics.js',
   './js/update-manager.js',
