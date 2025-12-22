@@ -15,7 +15,6 @@ index-old.html
 
 # Node modules (optional for future use)
 node_modules/
-package-lock.json
 
 # Editor files
 .vscode/
