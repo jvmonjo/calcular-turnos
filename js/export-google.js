@@ -37,7 +37,7 @@ function exportarGoogleCalendar(fechaInicio, turnoInicio) {
             const endDate = startDate; // Same day for single day event
             const endTime = '';
             const allDayEvent = 'True';
-            const description = `Jornada de trabajo - Turno ${item.turno}`;
+            const description = `Hoy toca el turno ${item.turno}`;
             const location = '';
 
             const row = [
